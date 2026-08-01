@@ -6,7 +6,7 @@ The website now has its own custom-designed form. Complete these one-time steps 
 2. Replace the starter code with the contents of `google-apps-script/Code.gs`.
 3. Click **Deploy → New deployment → Web app**.
 4. Choose **Execute as: Me** and **Who has access: Anyone**. Deploy, review the requested Drive and Sheets permissions, and copy the **Web app URL**.
-5. In `script.js`, replace `PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE` with that URL. Upload the updated file to GitHub Pages.
+5. In `script.js`, replace the deployment placeholder with that URL. Upload the updated file to GitHub Pages.
 
 After the first submission, the script creates a Drive folder named **Polytechnic Helpdesk Uploads** in the administrator's My Drive and a **Website Submissions** tab in the connected spreadsheet. The PDF link is included in each row.
 

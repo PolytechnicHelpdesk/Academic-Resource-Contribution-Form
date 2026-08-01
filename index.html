@@ -3,91 +3,104 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Submit and track academic resources for Polytechnic Helpdesk." />
-    <title>Polytechnic Helpdesk | Academic Resource Contribution</title>
+    <meta name="description" content="Polytechnic Helpdesk academic resource contribution portal." />
+    <meta name="theme-color" content="#123252" />
+    <title>Polytechnic Helpdesk | Resource Contribution</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href="#top" aria-label="Polytechnic Helpdesk home">
-        <span class="brand-mark" aria-hidden="true">PH</span>
-        <span><strong>Polytechnic</strong><small>Helpdesk</small></span>
+        <img src="assets/polytechnic-helpdesk-logo.jpg" alt="Polytechnic Helpdesk" />
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-copy"><strong>Academic Resource</strong><small>Contribution portal</small></span>
       </a>
-      <a class="help-link" href="mailto:helpdesk@polytechnic.edu">Need help?</a>
+      <a class="help-link" href="mailto:infoweb.user.as@gmail.com"><span aria-hidden="true">?</span> Need help</a>
     </header>
 
     <main id="top">
-      <section class="hero" aria-labelledby="page-title">
-        <p class="eyebrow">Academic resource portal</p>
-        <h1 id="page-title">Share knowledge.<br /><em>Strengthen learning.</em></h1>
-        <p>Contribute study material, practical files, question papers, or useful links for fellow Polytechnic students.</p>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">POLYTECHNIC HELPDESK</p>
+          <h1>Put your knowledge<br />to work for others.</h1>
+          <p>Share notes, lab work, question papers, and study resources that help the Polytechnic community learn together.</p>
+        </div>
+        <div class="hero-stat" aria-label="Submission review information">
+          <span class="stat-icon" aria-hidden="true">↗</span>
+          <strong>Reviewed with care</strong>
+          <small>Every contribution is checked before it is shared.</small>
+        </div>
       </section>
 
-      <section class="contribution-layout" aria-label="Academic resource contribution form">
-        <aside class="info-panel">
-          <div>
-            <p class="panel-label">Before you contribute</p>
-            <h2>Good resources make a difference.</h2>
-            <ul>
-              <li>Submit only material you are allowed to share.</li>
-              <li>Use clear filenames and accurate subject details.</li>
-              <li>Our academic team reviews every contribution.</li>
-            </ul>
-          </div>
-          <p class="privacy-note"><span aria-hidden="true">⌁</span> Your contact details are used only to review this submission.</p>
+      <section class="workspace" aria-label="Academic resource contribution form">
+        <aside class="resource-guide">
+          <p class="guide-label">HOW IT WORKS</p>
+          <h2>A simple way to give back.</h2>
+          <ol>
+            <li><span>01</span><div><strong>Complete the details</strong><p>Tell us who you are and what you are sharing.</p></div></li>
+            <li><span>02</span><div><strong>Attach your resource</strong><p>Upload a PDF or add a secure resource link.</p></div></li>
+            <li><span>03</span><div><strong>Our team reviews it</strong><p>Approved resources help students across the Polytechnic.</p></div></li>
+          </ol>
+          <div class="guide-note"><span aria-hidden="true">✓</span><p>Only submit material that you are permitted to share.</p></div>
         </aside>
 
-        <div class="form-card">
-          <div class="form-heading">
+        <section class="form-panel">
+          <div class="form-intro">
             <div>
-              <p class="eyebrow">Live contribution form</p>
-              <h2>Submit your resource</h2>
+              <p class="eyebrow">NEW CONTRIBUTION</p>
+              <h2>Share an academic resource</h2>
+              <p>Fields marked with <b>*</b> are required.</p>
             </div>
-            <p class="required-note">Uploads go directly to the helpdesk.</p>
+            <div class="secure-badge"><span class="status-dot" aria-hidden="true"></span> Secure upload</div>
           </div>
-          <div class="google-form-wrap">
-            <div class="upload-status"><span class="status-dot" aria-hidden="true"></span><span><strong>Secure file upload</strong> · PDFs are reviewed by the Polytechnic Helpdesk team.</span></div>
-            <form id="resource-form" novalidate>
-              <div class="form-section-title"><span>01</span><h3>Contributor details</h3></div>
-              <div class="form-grid two-columns">
-                <label>Full name <b>*</b><input name="name" type="text" autocomplete="name" required placeholder="Your full name" /><small class="error-message"></small></label>
-                <label>Email <b>*</b><input name="email" type="email" autocomplete="email" required placeholder="name@example.com" /><small class="error-message"></small></label>
-                <label>Department <b>*</b><select name="department" required><option value="">Select department</option><option>Computer Engineering</option><option>Chemical Engineering</option><option>Mechanical Engineering</option><option>Civil Engineering</option><option>Electrical Engineering</option><option>Electronic &amp; Telecommunication</option><option>Other</option></select><small class="error-message"></small></label>
-                <label>Semester <b>*</b><select name="semester" required><option value="">Select semester</option><option>Semester 1</option><option>Semester 2</option><option>Semester 3</option><option>Semester 4</option><option>Semester 5</option><option>Semester 6</option><option>Passed Out</option></select><small class="error-message"></small></label>
-              </div>
 
-              <div class="form-section-title second"><span>02</span><h3>Resource details</h3></div>
+          <form id="resource-form" novalidate>
+            <fieldset>
+              <legend><span>1</span> Your details</legend>
+              <div class="form-grid two-columns">
+                <label>Full name <b>*</b><input name="name" type="text" autocomplete="name" required placeholder="Enter your full name" /><small class="error-message"></small></label>
+                <label>Email <b>*</b><input name="email" type="email" autocomplete="email" required placeholder="name@example.com" /><small class="error-message"></small></label>
+                <label>Department <b>*</b><select name="department" required><option value="">Select your department</option><option>Computer Engineering</option><option>Chemical Engineering</option><option>Mechanical Engineering</option><option>Civil Engineering</option><option>Electrical Engineering</option><option>Electronic &amp; Telecommunication</option><option>Other</option></select><small class="error-message"></small></label>
+                <label>Semester <b>*</b><select name="semester" required><option value="">Select your semester</option><option>Semester 1</option><option>Semester 2</option><option>Semester 3</option><option>Semester 4</option><option>Semester 5</option><option>Semester 6</option><option>Passed Out</option></select><small class="error-message"></small></label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span>2</span> Resource information</legend>
               <div class="form-grid two-columns">
                 <label>Resource title <b>*</b><input name="title" type="text" required maxlength="100" placeholder="e.g. Applied Mathematics II notes" /><small class="error-message"></small></label>
-                <label>Resource type <b>*</b><select name="resourceType" required><option value="">Select resource type</option><option>Lecture notes</option><option>Practical / lab file</option><option>Previous question paper</option><option>Assignment / project</option><option>Reference link</option><option>Other</option></select><small class="error-message"></small></label>
-                <label class="full-row">Subject / course <b>*</b><input name="subject" type="text" required placeholder="Subject name or code" /><small class="error-message"></small></label>
-                <label class="full-row">Description <b>*</b><textarea name="description" rows="4" required maxlength="500" placeholder="Briefly explain what this resource contains and how it can help students."></textarea><span class="field-hint"><small class="error-message"></small><span><b id="description-count">0</b>/500</span></span></label>
+                <label>Resource type <b>*</b><select name="resourceType" required><option value="">Choose a resource type</option><option>Lecture notes</option><option>Practical / lab file</option><option>Previous question paper</option><option>Assignment / project</option><option>Reference link</option><option>Other</option></select><small class="error-message"></small></label>
+                <label class="full-row">Subject / course <b>*</b><input name="subject" type="text" required placeholder="Enter the subject name or code" /><small class="error-message"></small></label>
+                <label class="full-row">Description <b>*</b><textarea name="description" rows="4" required maxlength="500" placeholder="Briefly describe the resource and how it can help other students."></textarea><span class="field-hint"><small class="error-message"></small><span><b id="description-count">0</b> / 500</span></span></label>
               </div>
+            </fieldset>
 
-              <div class="form-section-title second"><span>03</span><h3>Attach your resource</h3></div>
+            <fieldset>
+              <legend><span>3</span> Add your resource</legend>
               <div class="form-grid two-columns attachment-grid">
-                <label>PDF file <b>*</b><span class="file-picker"><input id="resource-file" name="file" type="file" accept="application/pdf,.pdf" /><span>Choose PDF file</span></span><small id="file-name">PDF only · maximum file size 5 MB</small></label>
-                <label>Or resource link<input name="resourceLink" type="url" placeholder="https://drive.google.com/..." /><small>Use this only when you do not upload a PDF.</small></label>
+                <label>PDF document <b>*</b><span class="file-picker"><input id="resource-file" name="file" type="file" accept="application/pdf,.pdf" /><span class="upload-icon" aria-hidden="true">↑</span><span>Choose PDF file</span></span><small id="file-name">PDF only · Maximum file size 5 MB</small></label>
+                <label>Or resource link<input name="resourceLink" type="url" placeholder="https://drive.google.com/..." /><small>Use a public Drive, OneDrive, or web link instead of a PDF.</small></label>
               </div>
               <p id="file-link-error" class="error-message group-error" aria-live="polite"></p>
-              <label class="consent"><input name="consent" type="checkbox" required /><span>I confirm that I have permission to share this resource and that the information is accurate. <b>*</b></span></label>
-              <small class="error-message consent-error"></small>
-              <div class="form-actions"><button id="submit-button" type="submit">Submit contribution <span aria-hidden="true">→</span></button><p>Resources are reviewed before publication.</p></div>
-            </form>
-          </div>
-        </div>
+            </fieldset>
+
+            <label class="consent"><input name="consent" type="checkbox" required /><span>I confirm that I have permission to share this resource and that the information provided is accurate. <b>*</b></span></label>
+            <small class="error-message consent-error"></small>
+            <div class="form-actions"><button id="submit-button" type="submit">Submit resource <span aria-hidden="true">→</span></button><p>Your contribution will be reviewed before publication.</p></div>
+          </form>
+        </section>
       </section>
     </main>
 
-    <footer>© <span id="year"></span> Polytechnic Helpdesk · Academic Resource Centre</footer>
+    <footer><span>© <span id="year"></span> Polytechnic Helpdesk</span><span>Academic Resource Contribution Portal</span></footer>
 
     <dialog id="success-dialog" aria-labelledby="success-title">
       <div class="success-icon" aria-hidden="true">✓</div>
-      <p class="eyebrow">Contribution received</p>
-      <h2 id="success-title">Thank you for sharing.</h2>
+      <p class="eyebrow">SUBMISSION RECEIVED</p>
+      <h2 id="success-title">Thank you for contributing.</h2>
       <p>Your resource has been sent to the Polytechnic Helpdesk for review. Your PDF receipt has been downloaded.</p>
       <div class="dialog-actions"><button id="download-receipt" class="secondary" type="button">Download receipt</button><button id="close-dialog" type="button">Done</button></div>
     </dialog>
