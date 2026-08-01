@@ -5,6 +5,8 @@ const fileName = document.querySelector('#file-name');
 const description = form.elements.description;
 const department = form.elements.department;
 const otherDepartment = form.elements.otherDepartment;
+const statusForm = document.querySelector('#status-form');
+const receiptLookup = document.querySelector('#receipt-lookup');
 const maxFileSize = 5 * 1024 * 1024;
 let latestSubmission;
 
@@ -266,3 +268,86 @@ document.querySelector('#close-dialog').addEventListener('click', () => {
   form.querySelectorAll('.error-message').forEach((item) => item.textContent = '');
   form.querySelectorAll('.invalid').forEach((item) => item.classList.remove('invalid'));
 });
+
+statusForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const receiptNumber = receiptLookup.value.trim().toUpperCase();
+  const error = document.querySelector('#status-error');
+  const result = document.querySelector('#status-result');
+  error.textContent = '';
+  result.hidden = true;
+  if (!receiptNumber) {
+    error.textContent = 'Enter the receipt number from your PDF receipt.';
+    receiptLookup.focus();
+    return;
+  }
+
+  const button = statusForm.querySelector('button');
+  const callbackName = `polytechnicStatus${Date.now()}`;
+  const request = document.createElement('script');
+  let settled = false;
+  const finish = () => {
+    request.remove();
+    delete window[callbackName];
+  };
+  const timeout = window.setTimeout(() => {
+    if (settled) return;
+    settled = true;
+    finish();
+    button.disabled = false;
+    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
+    error.textContent = 'The status service did not respond. Please try again.';
+  }, 12000);
+
+  button.disabled = true;
+  button.textContent = 'Checking...';
+  window[callbackName] = (response) => {
+    if (settled) return;
+    settled = true;
+    window.clearTimeout(timeout);
+    finish();
+    button.disabled = false;
+    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
+    if (!response?.found) {
+      error.textContent = 'No submission was found for that receipt number.';
+      return;
+    }
+    renderSubmissionStatus(response);
+  };
+  request.onerror = () => {
+    if (settled) return;
+    settled = true;
+    window.clearTimeout(timeout);
+    finish();
+    button.disabled = false;
+    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
+    error.textContent = 'The status service could not be reached. Please try again.';
+  };
+  request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&callback=${callbackName}`;
+  document.head.appendChild(request);
+});
+
+function renderSubmissionStatus(response) {
+  const result = document.querySelector('#status-result');
+  const icon = document.querySelector('#status-icon');
+  const label = document.querySelector('#status-label');
+  const title = document.querySelector('#status-title-result');
+  const message = document.querySelector('#status-message');
+  const receipt = document.querySelector('#status-receipt');
+  const status = String(response.status || 'Under review').trim();
+  const normalized = status.toLowerCase();
+  let type = 'review';
+  let symbol = '…';
+  let description = 'Your submission is with the Polytechnic Helpdesk team for review.';
+  if (normalized === 'accepted') { type = 'accepted'; symbol = '✓'; description = 'Your resource has been accepted for the Polytechnic Helpdesk collection.'; }
+  if (normalized === 'rejected') { type = 'rejected'; symbol = '×'; description = 'Your resource was not accepted. Please contact the helpdesk for more information.'; }
+  if (normalized === 'partially accepted') { type = 'partial'; symbol = '◐'; description = 'Part of your submission was accepted. The helpdesk may contact you with details.'; }
+  if (normalized === 'partially rejected') { type = 'partial'; symbol = '◐'; description = 'Part of your submission was not accepted. The helpdesk may contact you with details.'; }
+  result.className = `status-result ${type}`;
+  icon.textContent = symbol;
+  label.textContent = 'Current decision';
+  title.textContent = status;
+  message.textContent = description;
+  receipt.textContent = `${response.receiptNumber} · ${response.resourceTitle || 'Academic resource contribution'}`;
+  result.hidden = false;
+}

@@ -10,6 +10,7 @@ A static, responsive contribution form designed for GitHub Pages.
 - An animated upload screen keeps contributors informed while a resource is sent
 - A branded PDF receipt is generated for the contributor after submission
 - Receipt numbers are stored in the **Website Submissions** Sheet for admin lookup
+- Students can check a receipt number on the website; update the Sheet's **Submission status** cell to `Accepted`, `Rejected`, `Partially accepted`, or `Partially rejected`
 - Additional resource types and a conditional department-name field for "Other"
 
 ## Publish with GitHub Pages

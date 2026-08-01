@@ -6,10 +6,24 @@ const SPREADSHEET_ID = '1mPPYrSRvRncwxKeoUb3FwF8N71LD2wPLVH9cU9ulVdw';
 const SHEET_NAME = 'Website Submissions';
 const UPLOAD_FOLDER_NAME = 'Polytechnic Helpdesk Uploads';
 const MAX_PDF_BYTES = 5 * 1024 * 1024;
-const HEADERS = ['Receipt no.', 'Submitted at', 'Name', 'Email', 'Department', 'Semester', 'Resource title', 'Resource type', 'Subject', 'Description', 'Resource link', 'PDF filename', 'PDF in Drive'];
+const HEADERS = ['Receipt no.', 'Submitted at', 'Name', 'Email', 'Department', 'Semester', 'Resource title', 'Resource type', 'Subject', 'Description', 'Resource link', 'PDF filename', 'PDF in Drive', 'Submission status'];
 
-function doGet() {
-  return ContentService.createTextOutput('Polytechnic Helpdesk upload service is running.');
+function doGet(event) {
+  const receiptNumber = event && event.parameter ? String(event.parameter.receipt || '').trim().toUpperCase() : '';
+  const callback = event && event.parameter ? String(event.parameter.callback || '') : '';
+  if (!receiptNumber) return ContentService.createTextOutput('Polytechnic Helpdesk upload service is running.');
+
+  const sheet = getSheet_();
+  const values = sheet.getDataRange().getValues();
+  const headers = values.shift() || [];
+  const receiptIndex = headers.indexOf('Receipt no.');
+  const statusIndex = headers.indexOf('Submission status');
+  const titleIndex = headers.indexOf('Resource title');
+  const match = values.find((row) => String(row[receiptIndex] || '').trim().toUpperCase() === receiptNumber);
+  const response = match
+    ? { found: true, receiptNumber: String(match[receiptIndex]), status: String(match[statusIndex] || 'Under review'), resourceTitle: String(match[titleIndex] || '') }
+    : { found: false };
+  return jsonp_(callback, response);
 }
 
 function doPost(event) {
@@ -21,7 +35,7 @@ function doPost(event) {
     sheet.appendRow([
       data.receiptNumber, new Date(), data.name, data.email, data.department, data.semester,
       data.title, data.resourceType, data.subject, data.description,
-      data.resourceLink || '', data.file ? data.file.name : '', fileUrl
+      data.resourceLink || '', data.file ? data.file.name : '', fileUrl, 'Under review'
     ]);
     return json_({ ok: true });
   } catch (error) {
@@ -68,9 +82,18 @@ function getSheet_() {
     sheet.insertColumnBefore(1);
     sheet.getRange(1, 1).setValue('Receipt no.');
   }
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  if (!headers.includes('Submission status')) {
+    sheet.getRange(1, sheet.getLastColumn() + 1).setValue('Submission status');
+  }
   return sheet;
 }
 
 function json_(value) {
   return ContentService.createTextOutput(JSON.stringify(value)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function jsonp_(callback, value) {
+  if (!/^[a-zA-Z_$][0-9a-zA-Z_$]*$/.test(callback)) return json_(value);
+  return ContentService.createTextOutput(`${callback}(${JSON.stringify(value)});`).setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
