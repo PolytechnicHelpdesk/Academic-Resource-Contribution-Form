@@ -9,6 +9,7 @@ A static, responsive contribution form designed for GitHub Pages.
 - Submission details and Drive links are added to the connected spreadsheet
 - An animated upload screen keeps contributors informed while a resource is sent
 - A branded PDF receipt is generated for the contributor after submission
+- Receipt numbers are stored in the **Website Submissions** Sheet for admin lookup
 - Additional resource types and a conditional department-name field for "Other"
 
 ## Publish with GitHub Pages

@@ -96,13 +96,14 @@ form.addEventListener('submit', async (event) => {
     delete data.consent;
     if (data.department === 'Other') data.department = `Other - ${data.otherDepartment.trim()}`;
     delete data.otherDepartment;
+    data.receiptNumber = createReceiptNumber();
     data.file = file ? { name: file.name, mimeType: file.type, base64: await readFile(file) } : null;
 
     showUploadStatus(file ? 'Uploading your PDF to the Polytechnic Helpdesk...' : 'Sending your resource details to the Polytechnic Helpdesk...');
     submitButton.textContent = 'Uploading resource...';
     await fetch(APPS_SCRIPT_WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
 
-    latestSubmission = { ...data, receiptNumber: `PH-${Date.now().toString().slice(-8)}`, submittedAt: new Date().toISOString() };
+    latestSubmission = { ...data, submittedAt: new Date().toISOString() };
     hideUploadStatus();
     downloadReceipt(latestSubmission);
     document.querySelector('#success-dialog').showModal();
@@ -114,6 +115,13 @@ form.addEventListener('submit', async (event) => {
     submitButton.innerHTML = 'Submit resource <span aria-hidden="true">→</span>';
   }
 });
+
+function createReceiptNumber() {
+  const date = new Date();
+  const day = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+  const random = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `PH-${day}-${random}`;
+}
 
 function downloadReceipt(data) {
   if (!window.jspdf) return;
