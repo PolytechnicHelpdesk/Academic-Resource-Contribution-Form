@@ -3,15 +3,40 @@ const form = document.querySelector('#resource-form');
 const fileInput = document.querySelector('#resource-file');
 const fileName = document.querySelector('#file-name');
 const description = form.elements.description;
+const department = form.elements.department;
+const otherDepartment = form.elements.otherDepartment;
 const maxFileSize = 5 * 1024 * 1024;
 let latestSubmission;
 
 document.querySelector('#year').textContent = new Date().getFullYear();
-description.addEventListener('input', () => document.querySelector('#description-count').textContent = description.value.length);
+
+description.addEventListener('input', () => {
+  document.querySelector('#description-count').textContent = description.value.length;
+});
+
 fileInput.addEventListener('change', () => {
   const file = fileInput.files[0];
-  fileName.textContent = file ? `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB` : 'PDF only · maximum file size 5 MB';
+  fileName.textContent = file ? `${file.name} - ${(file.size / 1024 / 1024).toFixed(2)} MB` : 'PDF only - Maximum file size 5 MB';
 });
+
+department.addEventListener('change', () => {
+  const isOther = department.value === 'Other';
+  document.querySelector('#other-department-field').hidden = !isOther;
+  otherDepartment.required = isOther;
+  if (!isOther) {
+    otherDepartment.value = '';
+    setError(otherDepartment);
+  }
+});
+
+function showUploadStatus(message) {
+  document.querySelector('#upload-status').textContent = message;
+  document.querySelector('#upload-overlay').hidden = false;
+}
+
+function hideUploadStatus() {
+  document.querySelector('#upload-overlay').hidden = true;
+}
 
 function setError(field, message = '') {
   field.classList.toggle('invalid', Boolean(message));
@@ -27,6 +52,7 @@ function validate() {
     setError(field, message);
     if (message) valid = false;
   });
+
   const file = fileInput.files[0];
   const link = form.elements.resourceLink.value.trim();
   const groupError = document.querySelector('#file-link-error');
@@ -35,6 +61,7 @@ function validate() {
   if (file && file.type !== 'application/pdf') { groupError.textContent = 'Please select a PDF file.'; valid = false; }
   if (file && file.size > maxFileSize) { groupError.textContent = 'The PDF must be 5 MB or smaller.'; valid = false; }
   if (link && !form.elements.resourceLink.validity.valid) { setError(form.elements.resourceLink, 'Enter a valid URL.'); valid = false; }
+
   const consentError = document.querySelector('.consent-error');
   consentError.textContent = form.elements.consent.checked ? '' : 'Please confirm before submitting.';
   return valid && form.elements.consent.checked;
@@ -56,24 +83,35 @@ form.addEventListener('submit', async (event) => {
     document.querySelector('#file-link-error').textContent = 'The upload service has not been connected yet. Follow GOOGLE_DRIVE_SETUP.md first.';
     return;
   }
+
   const submitButton = document.querySelector('#submit-button');
   submitButton.disabled = true;
-  submitButton.textContent = 'Sending contribution…';
+  submitButton.textContent = 'Preparing upload...';
+  showUploadStatus('Preparing your document securely...');
+
   try {
     const file = fileInput.files[0];
     const data = Object.fromEntries(new FormData(form).entries());
     delete data.file;
     delete data.consent;
+    if (data.department === 'Other') data.department = `Other - ${data.otherDepartment.trim()}`;
+    delete data.otherDepartment;
     data.file = file ? { name: file.name, mimeType: file.type, base64: await readFile(file) } : null;
+
+    showUploadStatus(file ? 'Uploading your PDF to the helpdesk...' : 'Sending your resource details...');
+    submitButton.textContent = 'Uploading resource...';
     await fetch(APPS_SCRIPT_WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+
     latestSubmission = { ...data, receiptNumber: `PH-${Date.now().toString().slice(-8)}`, submittedAt: new Date().toISOString() };
+    hideUploadStatus();
     downloadReceipt(latestSubmission);
     document.querySelector('#success-dialog').showModal();
   } catch (error) {
+    hideUploadStatus();
     document.querySelector('#file-link-error').textContent = 'The contribution could not be sent. Please try again.';
   } finally {
     submitButton.disabled = false;
-    submitButton.innerHTML = 'Submit contribution <span aria-hidden="true">→</span>';
+    submitButton.innerHTML = 'Submit resource <span aria-hidden="true">→</span>';
   }
 });
 
@@ -82,65 +120,105 @@ function downloadReceipt(data) {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const margin = 18;
-  let y = 20;
+  const margin = 16;
+  const contentWidth = pageWidth - margin * 2;
+  const submitted = new Date(data.submittedAt).toLocaleString();
+  const gap = 5;
+  const half = (contentWidth - gap) / 2;
 
-  pdf.setFillColor(27, 94, 69);
-  pdf.rect(0, 0, pageWidth, 44, 'F');
+  const drawCell = (x, y, width, label, value, height = 18) => {
+    pdf.setFillColor(247, 250, 252);
+    pdf.roundedRect(x, y, width, height, 3, 3, 'F');
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(93, 113, 131);
+    pdf.text(label.toUpperCase(), x + 5, y + 5.7);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9.5);
+    pdf.setTextColor(24, 42, 59);
+    pdf.text(pdf.splitTextToSize(String(value || 'Not provided'), width - 10), x + 5, y + 11.7);
+  };
+
+  const drawSection = (title, y) => {
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(18, 50, 82);
+    pdf.text(title.toUpperCase(), margin, y);
+    pdf.setDrawColor(216, 228, 237);
+    pdf.line(margin + 44, y - 1.5, pageWidth - margin, y - 1.5);
+  };
+
+  pdf.setFillColor(18, 50, 82);
+  pdf.rect(0, 0, pageWidth, 58, 'F');
+  pdf.setFillColor(34, 116, 185);
+  pdf.rect(0, 55, pageWidth, 3, 'F');
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(pageWidth - 48, 12, 31, 31, 4, 4, 'F');
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(16);
+  pdf.setTextColor(18, 50, 82);
+  pdf.text('PH', pageWidth - 40.5, 31);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(17);
+  pdf.text('POLYTECHNIC HELPDESK', margin, 22);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(9.5);
+  pdf.setTextColor(199, 221, 238);
+  pdf.text('Academic Resource Contribution Receipt', margin, 31);
+  pdf.setFontSize(8);
+  pdf.text(`Receipt no. ${data.receiptNumber}`, margin, 42);
+
+  pdf.setFillColor(232, 247, 237);
+  pdf.roundedRect(margin, 63, contentWidth, 18, 4, 4, 'F');
+  pdf.setFillColor(31, 150, 85);
+  pdf.circle(margin + 10, 72, 3.5, 'F');
   pdf.setTextColor(255, 255, 255);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(19);
-  pdf.text('POLYTECHNIC HELPDESK', margin, 19);
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(10);
-  pdf.text('Academic Resource Contribution Receipt', margin, 27);
-  pdf.setFontSize(8);
-  pdf.text(`Receipt No. ${data.receiptNumber}`, margin, 35);
-  y = 58;
-
-  pdf.setTextColor(22, 38, 30);
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(18);
-  pdf.text('Contribution received', margin, y);
-  y += 9;
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(10);
-  pdf.setTextColor(83, 97, 88);
-  pdf.text(`Submitted on ${new Date(data.submittedAt).toLocaleString()}`, margin, y);
-  y += 13;
-
-  const rows = [
-    ['Contributor', data.name], ['Email', data.email], ['Department', data.department], ['Semester', data.semester],
-    ['Resource title', data.title], ['Resource type', data.resourceType], ['Subject / course', data.subject],
-    ['PDF file', data.file?.name || 'Not attached'], ['Resource link', data.resourceLink || 'Not provided']
-  ];
-  rows.forEach(([label, value], index) => {
-    const height = Math.max(10, pdf.getTextDimensions(pdf.splitTextToSize(String(value), 118)).h + 5);
-    if (index % 2 === 0) { pdf.setFillColor(245, 248, 244); pdf.rect(margin, y - 5, pageWidth - margin * 2, height, 'F'); }
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(9);
-    pdf.setTextColor(27, 94, 69);
-    pdf.text(label, margin + 4, y + 1);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(36, 48, 41);
-    pdf.text(pdf.splitTextToSize(String(value), 118), margin + 43, y + 1);
-    y += height;
-  });
-  y += 4;
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(10);
-  pdf.setTextColor(27, 94, 69);
-  pdf.text('Description', margin, y);
-  y += 6;
-  pdf.setFont('helvetica', 'normal');
-  pdf.setTextColor(36, 48, 41);
   pdf.setFontSize(9);
-  pdf.text(pdf.splitTextToSize(data.description, pageWidth - margin * 2), margin, y);
-  pdf.setDrawColor(202, 93, 55);
-  pdf.line(margin, 281, pageWidth - margin, 281);
-  pdf.setFontSize(8);
-  pdf.setTextColor(100, 113, 106);
-  pdf.text('Keep this receipt for your records. Your contribution will be reviewed before publication.', margin, 288);
+  pdf.text('✓', margin + 8.1, 73.7);
+  pdf.setTextColor(24, 104, 58);
+  pdf.setFontSize(11);
+  pdf.text('Contribution received', margin + 20, 70.8);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(8.5);
+  pdf.setTextColor(67, 121, 91);
+  pdf.text(`Submitted ${submitted}`, margin + 20, 76.5);
+
+  let y = 91;
+  drawSection('Contributor details', y);
+  y += 7;
+  drawCell(margin, y, half, 'Contributor', data.name);
+  drawCell(margin + half + gap, y, half, 'Email', data.email);
+  y += 22;
+  drawCell(margin, y, half, 'Department', data.department);
+  drawCell(margin + half + gap, y, half, 'Semester', data.semester);
+  y += 28;
+  drawSection('Resource information', y);
+  y += 7;
+  drawCell(margin, y, contentWidth, 'Resource title', data.title);
+  y += 22;
+  drawCell(margin, y, half, 'Resource type', data.resourceType);
+  drawCell(margin + half + gap, y, half, 'Subject / course', data.subject);
+  y += 22;
+  drawCell(margin, y, half, 'Attached PDF', data.file?.name || 'No PDF attached');
+  drawCell(margin + half + gap, y, half, 'Resource link', data.resourceLink || 'Not provided');
+  y += 28;
+  drawSection('Contributor note', y);
+  y += 7;
+  const descriptionLines = pdf.splitTextToSize(data.description, contentWidth - 10);
+  const descriptionHeight = Math.max(28, descriptionLines.length * 4.3 + 14);
+  pdf.setFillColor(247, 250, 252);
+  pdf.roundedRect(margin, y, contentWidth, descriptionHeight, 3, 3, 'F');
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(9.2);
+  pdf.setTextColor(40, 58, 73);
+  pdf.text(descriptionLines, margin + 5, y + 9);
+  pdf.setDrawColor(216, 228, 237);
+  pdf.line(margin, 283, pageWidth - margin, 283);
+  pdf.setFontSize(7.8);
+  pdf.setTextColor(107, 125, 140);
+  pdf.text('Keep this receipt for your records. Resources are reviewed before publication.', margin, 290);
+  pdf.text('Polytechnic Helpdesk - Academic Resource Contribution Portal', pageWidth - margin, 290, { align: 'right' });
   pdf.save(`${data.receiptNumber}-polytechnic-helpdesk-receipt.pdf`);
 }
 
@@ -151,8 +229,10 @@ document.querySelector('#download-receipt').addEventListener('click', () => {
 document.querySelector('#close-dialog').addEventListener('click', () => {
   document.querySelector('#success-dialog').close();
   form.reset();
+  document.querySelector('#other-department-field').hidden = true;
+  otherDepartment.required = false;
   document.querySelector('#description-count').textContent = '0';
-  fileName.textContent = 'PDF only · maximum file size 5 MB';
+  fileName.textContent = 'PDF only - Maximum file size 5 MB';
   form.querySelectorAll('.error-message').forEach((item) => item.textContent = '');
   form.querySelectorAll('.invalid').forEach((item) => item.classList.remove('invalid'));
 });
