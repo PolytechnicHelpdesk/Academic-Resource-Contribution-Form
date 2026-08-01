@@ -176,11 +176,11 @@ function downloadReceipt(data) {
   pdf.setFillColor(232, 247, 237);
   pdf.roundedRect(margin, 63, contentWidth, 18, 4, 4, 'F');
   pdf.setFillColor(31, 150, 85);
-  pdf.circle(margin + 10, 72, 3.5, 'F');
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(9);
-  pdf.text('✓', margin + 8.1, 73.7);
+  pdf.circle(margin + 10, 72, 4.4, 'F');
+  pdf.setDrawColor(255, 255, 255);
+  pdf.setLineWidth(1.1);
+  pdf.line(margin + 7.4, 72, margin + 9.5, 74.1);
+  pdf.line(margin + 9.5, 74.1, margin + 13, 69.8);
   pdf.setTextColor(24, 104, 58);
   pdf.setFontSize(11);
   pdf.text('Contribution received', margin + 20, 70.8);
@@ -228,22 +228,16 @@ function downloadReceipt(data) {
 }
 
 function getReceiptLogoMark() {
-  const logo = document.querySelector('.brand img');
+  const logo = document.querySelector('#receipt-logo-source');
   if (!logo || !logo.complete || !logo.naturalWidth) return null;
   try {
     const canvas = document.createElement('canvas');
     canvas.width = 400;
-    canvas.height = 430;
+    canvas.height = 400;
     const context = canvas.getContext('2d');
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    const sourceWidth = logo.naturalWidth;
-    const sourceHeight = logo.naturalHeight;
-    context.drawImage(
-      logo,
-      sourceWidth * 0.28, sourceHeight * 0.10, sourceWidth * 0.44, sourceHeight * 0.56,
-      0, 0, canvas.width, canvas.height
-    );
+    context.drawImage(logo, 0, 0, canvas.width, canvas.height);
     return canvas.toDataURL('image/jpeg', 0.95);
   } catch {
     return null;
