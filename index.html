@@ -43,119 +43,21 @@
         <div class="form-card">
           <div class="form-heading">
             <div>
-              <p class="eyebrow">Contribution form</p>
-              <h2>Tell us about your resource</h2>
+              <p class="eyebrow">Live contribution form</p>
+              <h2>Submit your resource</h2>
             </div>
-            <p class="required-note"><span>*</span> Required fields</p>
+            <p class="required-note">Uploads go directly to the helpdesk.</p>
           </div>
-
-          <form id="resource-form" novalidate>
-            <fieldset>
-              <legend>Contributor details</legend>
-              <div class="form-grid two-columns">
-                <label>Full name <span>*</span>
-                  <input name="name" type="text" autocomplete="name" required placeholder="Your full name" />
-                  <small class="error-message"></small>
-                </label>
-                <label>College email <span>*</span>
-                  <input name="email" type="email" autocomplete="email" required placeholder="name@college.edu" />
-                  <small class="error-message"></small>
-                </label>
-                <label>Enrollment number
-                  <input name="enrollmentNumber" type="text" placeholder="e.g. 2024-12345" />
-                </label>
-                <label>Department <span>*</span>
-                  <select name="department" required>
-                    <option value="">Select department</option>
-                    <option>Computer Engineering</option>
-                    <option>Information Technology</option>
-                    <option>Mechanical Engineering</option>
-                    <option>Civil Engineering</option>
-                    <option>Electrical Engineering</option>
-                    <option>Electronics &amp; Communication</option>
-                    <option>Other</option>
-                  </select>
-                  <small class="error-message"></small>
-                </label>
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend>Resource details</legend>
-              <div class="form-grid two-columns">
-                <label>Resource title <span>*</span>
-                  <input name="title" type="text" required maxlength="100" placeholder="e.g. Applied Mathematics II notes" />
-                  <small class="error-message"></small>
-                </label>
-                <label>Resource type <span>*</span>
-                  <select name="resourceType" required>
-                    <option value="">Select type</option>
-                    <option>Lecture notes</option>
-                    <option>Practical / lab file</option>
-                    <option>Previous question paper</option>
-                    <option>Assignment / project</option>
-                    <option>Reference link</option>
-                    <option>Other</option>
-                  </select>
-                  <small class="error-message"></small>
-                </label>
-                <label>Semester <span>*</span>
-                  <select name="semester" required>
-                    <option value="">Select semester</option>
-                    <option>Semester 1</option><option>Semester 2</option><option>Semester 3</option>
-                    <option>Semester 4</option><option>Semester 5</option><option>Semester 6</option>
-                  </select>
-                  <small class="error-message"></small>
-                </label>
-                <label>Subject / course <span>*</span>
-                  <input name="subject" type="text" required placeholder="Subject name or code" />
-                  <small class="error-message"></small>
-                </label>
-              </div>
-              <label>Description <span>*</span>
-                <textarea name="description" required maxlength="500" rows="4" placeholder="Briefly explain what this resource contains and how it can help students."></textarea>
-                <span class="field-hint"><span class="error-message"></span><span><b id="description-count">0</b>/500</span></span>
-              </label>
-              <div class="form-grid two-columns file-area">
-                <label>Resource file
-                  <span class="file-picker"><input id="resource-file" name="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,image/*" /><span>Choose file</span></span>
-                  <small id="file-name">PDF, DOCX, PPTX, XLSX, ZIP or image · max 10 MB</small>
-                </label>
-                <label>Or resource link
-                  <input name="resourceLink" type="url" placeholder="https://..." />
-                  <small>Paste a Drive, OneDrive, or public web link.</small>
-                </label>
-              </div>
-              <p id="file-link-error" class="error-message group-error" aria-live="polite"></p>
-            </fieldset>
-
-            <label class="consent">
-              <input name="consent" type="checkbox" required />
-              <span>I confirm that I have permission to share this resource and that the information provided is accurate. <b>*</b></span>
-            </label>
-            <small class="error-message consent-error"></small>
-
-            <div class="form-actions">
-              <button type="submit">Submit contribution <span aria-hidden="true">→</span></button>
-              <p>Resources are reviewed before publication.</p>
-            </div>
-          </form>
+          <div class="google-form-wrap">
+            <p>Complete the form below to send your details and resource file to the academic helpdesk.</p>
+            <iframe title="Polytechnic Helpdesk Academic Resource Contribution Form" src="https://docs.google.com/forms/d/e/1FAIpQLSekCk6GkxRApQQI-CjdiSWjAITWMuE8ZOkI8FQbsQ4tbQUudA/viewform?embedded=true">Loading…</iframe>
+            <p class="form-fallback">If the form does not load, <a href="https://docs.google.com/forms/d/e/1FAIpQLSekCk6GkxRApQQI-CjdiSWjAITWMuE8ZOkI8FQbsQ4tbQUudA/viewform?usp=header" target="_blank" rel="noopener">open it in a new tab</a>.</p>
+          </div>
         </div>
       </section>
     </main>
 
     <footer>© <span id="year"></span> Polytechnic Helpdesk · Academic Resource Centre</footer>
-
-    <dialog id="success-dialog" aria-labelledby="success-title">
-      <div class="success-icon" aria-hidden="true">✓</div>
-      <p class="eyebrow">Contribution received</p>
-      <h2 id="success-title">Thank you for sharing.</h2>
-      <p>Your reference number is <strong id="reference-number"></strong>. We will review the resource and contact you if we need more details.</p>
-      <div class="dialog-actions">
-        <button id="download-receipt" class="secondary" type="button">Download receipt</button>
-        <button id="close-dialog" type="button">Done</button>
-      </div>
-    </dialog>
 
     <script src="script.js"></script>
   </body>

@@ -4,9 +4,9 @@ A static, responsive contribution form designed for GitHub Pages.
 
 ## What works
 
-- Required-field, email, URL, consent, file/link, and 10 MB file-size validation
-- Resource metadata is stored in the contributor's browser (local storage)
-- On successful submission, a reference number and downloadable JSON receipt are generated
+- Live Google Form embedded in the page
+- PDF uploads and responses are collected by the linked Google Form
+- Administrators can review files in the form owner's Google Drive and responses in the linked spreadsheet
 
 ## Publish with GitHub Pages
 
@@ -15,6 +15,6 @@ A static, responsive contribution form designed for GitHub Pages.
 3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`, then save.
 4. GitHub will show the public site address after deployment.
 
-## Important limitation
+## Google Drive connection
 
-GitHub Pages hosts static files only. This version validates and records submissions on the contributor's own device, but cannot deliver uploaded files or form entries to an administrator. Connect the form to a backend or a form service (for example, Formspree, Firebase, or Supabase) when you need central collection and review.
+The embedded Google Form is responsible for accepting and storing submissions. To accept PDFs, make sure its **File upload** question stays enabled and is configured to accept PDFs. Google requires a respondent to sign in before they can upload a file.
