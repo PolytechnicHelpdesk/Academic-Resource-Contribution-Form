@@ -1,4 +1,4 @@
-const APPS_SCRIPT_WEB_APP_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwO7q8KLic-EulBQkrgOt_df4gIwPJ_syE5ISFYtaWWKONLxzfc_Uo6ALCA69bBeJ7o/exec';
 const form = document.querySelector('#resource-form');
 const fileInput = document.querySelector('#resource-file');
 const fileName = document.querySelector('#file-name');
