@@ -59,31 +59,31 @@
 
           <form id="resource-form" novalidate>
             <fieldset>
-              <legend><span>1</span> Your details</legend>
+              <legend><span>1</span> Your Details</legend>
               <div class="form-grid two-columns">
-                <label>Full name <b>*</b><input name="name" type="text" autocomplete="name" required placeholder="Enter your full name" /><small class="error-message"></small></label>
+                <label>Full Name <b>*</b><input name="name" type="text" autocomplete="name" required placeholder="Enter your full name" /><small class="error-message"></small></label>
                 <label>Email <b>*</b><input name="email" type="email" autocomplete="email" required placeholder="name@example.com" /><small class="error-message"></small></label>
                 <label>Department <b>*</b><select name="department" required><option value="">Select your department</option><option>Computer Engineering</option><option>Chemical Engineering</option><option>Mechanical Engineering</option><option>Civil Engineering</option><option>Electrical Engineering</option><option>Electronic &amp; Telecommunication</option><option>Other</option></select><small class="error-message"></small></label>
                 <label>Semester <b>*</b><select name="semester" required><option value="">Select your semester</option><option>Semester 1</option><option>Semester 2</option><option>Semester 3</option><option>Semester 4</option><option>Semester 5</option><option>Semester 6</option><option>Passed Out</option></select><small class="error-message"></small></label>
-                <label id="other-department-field" class="full-row conditional-field" hidden>Department name <b>*</b><input name="otherDepartment" type="text" placeholder="Enter your department name" /><small class="error-message"></small></label>
+                <label id="other-department-field" class="full-row conditional-field" hidden>Department Name <b>*</b><input name="otherDepartment" type="text" placeholder="Enter your department name" /><small class="error-message"></small></label>
               </div>
             </fieldset>
 
             <fieldset>
-              <legend><span>2</span> Resource information</legend>
+              <legend><span>2</span> Resource Information</legend>
               <div class="form-grid two-columns">
-                <label>Resource title <b>*</b><input name="title" type="text" required maxlength="100" placeholder="e.g. Applied Mathematics II notes" /><small class="error-message"></small></label>
-                <label>Resource type <b>*</b><select name="resourceType" required><option value="">Choose a resource type</option><option>Notifications</option><option>Syllabus</option><option>Handwritten notes</option><option>Lecture notes</option><option>Practical / lab file</option><option>Previous question paper</option><option>Assignment / project</option><option>Reference link</option><option>Other</option></select><small class="error-message"></small></label>
-                <label class="full-row">Subject / course <b>*</b><input name="subject" type="text" required placeholder="Enter the subject name or code" /><small class="error-message"></small></label>
+                <label>Resource Title <b>*</b><input name="title" type="text" required maxlength="100" placeholder="e.g. Applied Mathematics II notes" /><small class="error-message"></small></label>
+                <label>Resource Type <b>*</b><select name="resourceType" required><option value="">Choose a resource type</option><option>Notifications</option><option>Syllabus</option><option>Handwritten notes</option><option>Lecture notes</option><option>Practical / lab file</option><option>Previous question paper</option><option>Assignment / project</option><option>Reference link</option><option>Other</option></select><small class="error-message"></small></label>
+                <label class="full-row">Subject / Course <b>*</b><input name="subject" type="text" required placeholder="Enter the subject name or code" /><small class="error-message"></small></label>
                 <label class="full-row">Description <b>*</b><textarea name="description" rows="4" required maxlength="500" placeholder="Briefly describe the resource and how it can help other students."></textarea><span class="field-hint"><small class="error-message"></small><span><b id="description-count">0</b> / 500</span></span></label>
               </div>
             </fieldset>
 
             <fieldset>
-              <legend><span>3</span> Add your resource</legend>
+              <legend><span>3</span> Add Your Resource</legend>
               <div class="form-grid two-columns attachment-grid">
-                <label>PDF document <b>*</b><span class="file-picker"><input id="resource-file" name="file" type="file" accept="application/pdf,.pdf" /><span class="upload-icon" aria-hidden="true">↑</span><span>Choose PDF file</span></span><small id="file-name">PDF only · Maximum file size 5 MB</small></label>
-                <label>Or resource link<input name="resourceLink" type="url" placeholder="https://drive.google.com/..." /><small>Use a public Drive, OneDrive, or web link instead of a PDF.</small></label>
+                <label>PDF Document <b>*</b><span class="file-picker"><input id="resource-file" name="file" type="file" accept="application/pdf,.pdf" /><span class="upload-icon" aria-hidden="true">↑</span><span>Choose PDF file</span></span><small id="file-name">PDF only · Maximum file size 5 MB</small></label>
+                <label>Or Resource Link<input name="resourceLink" type="url" placeholder="https://drive.google.com/..." /><small>Use a public Drive, OneDrive, or web link instead of a PDF.</small></label>
               </div>
               <p id="file-link-error" class="error-message group-error" aria-live="polite"></p>
             </fieldset>
@@ -97,7 +97,7 @@
 
       <section id="check-status" class="status-section" aria-labelledby="status-title">
         <div class="status-intro">
-          <p class="eyebrow">STUDENT SUBMISSION TRACKER</p>
+          <p class="eyebrow">RESOURCE SUBMISSION TRACKER</p>
           <h2 id="status-title">Check your contribution status</h2>
           <p>Enter the receipt number from your PDF receipt to see the latest decision from the Polytechnic Helpdesk team.</p>
           <div class="status-key" aria-label="Possible contribution statuses"><span class="key-accepted">Accepted</span><span class="key-review">Under Review</span><span class="key-partial">Partially Accepted</span><span class="key-rejected">Rejected</span><span class="key-rejected">Partially Rejected</span></div>
@@ -125,7 +125,7 @@
       <p class="eyebrow">SUBMISSION RECEIVED</p>
       <h2 id="success-title">Thank you for contributing.</h2>
       <p>Your resource has been sent to the Polytechnic Helpdesk. Your PDF receipt has been downloaded.</p>
-      <p class="default-status"><span>Current status</span><strong>Under Review</strong></p>
+      <p class="default-status"><span>Receipt No.</span><strong id="confirmation-receipt-number"></strong></p>
       <div class="dialog-actions"><button id="download-receipt" class="secondary" type="button">Download receipt</button><button id="close-dialog" type="button">Done</button></div>
     </dialog>
 

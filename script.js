@@ -108,6 +108,7 @@ form.addEventListener('submit', async (event) => {
     latestSubmission = { ...data, submittedAt: new Date().toISOString() };
     hideUploadStatus();
     downloadReceipt(latestSubmission);
+    document.querySelector('#confirmation-receipt-number').textContent = latestSubmission.receiptNumber;
     document.querySelector('#success-dialog').showModal();
   } catch (error) {
     hideUploadStatus();
