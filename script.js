@@ -334,15 +334,16 @@ function renderSubmissionStatus(response) {
   const title = document.querySelector('#status-title-result');
   const message = document.querySelector('#status-message');
   const receipt = document.querySelector('#status-receipt');
-  const status = String(response.status || 'Under review').trim();
-  const normalized = status.toLowerCase();
+  const rawStatus = String(response.status || 'Under Review');
+  const normalized = rawStatus.replace(/[\s_-]+/g, ' ').trim().toLowerCase();
+  const status = normalized.replace(/\b\w/g, (letter) => letter.toUpperCase());
   let type = 'review';
   let symbol = '…';
   let description = 'Your submission is with the Polytechnic Helpdesk team for review.';
   if (normalized === 'accepted') { type = 'accepted'; symbol = '✓'; description = 'Your resource has been accepted for the Polytechnic Helpdesk collection.'; }
-  if (normalized === 'rejected') { type = 'rejected'; symbol = '×'; description = 'Your resource was not accepted. Please contact the helpdesk for more information.'; }
-  if (normalized === 'partially accepted') { type = 'partial'; symbol = '◐'; description = 'Part of your submission was accepted. The helpdesk may contact you with details.'; }
-  if (normalized === 'partially rejected') { type = 'partial'; symbol = '◐'; description = 'Part of your submission was not accepted. The helpdesk may contact you with details.'; }
+  else if (normalized === 'rejected') { type = 'rejected'; symbol = '×'; description = 'Your resource was not accepted. Please contact the helpdesk for more information.'; }
+  else if (normalized === 'partially accepted') { type = 'partial'; symbol = '◐'; description = 'Part of your submission was accepted. The helpdesk may contact you with details.'; }
+  else if (normalized === 'partially rejected') { type = 'rejected'; symbol = '◐'; description = 'Part of your submission was not accepted. The helpdesk may contact you with details.'; }
   result.className = `status-result ${type}`;
   icon.textContent = symbol;
   label.textContent = 'Current decision';

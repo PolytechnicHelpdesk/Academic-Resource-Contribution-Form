@@ -21,7 +21,7 @@ function doGet(event) {
   const titleIndex = headers.indexOf('Resource title');
   const match = values.find((row) => String(row[receiptIndex] || '').trim().toUpperCase() === receiptNumber);
   const response = match
-    ? { found: true, receiptNumber: String(match[receiptIndex]), status: String(match[statusIndex] || 'Under review'), resourceTitle: String(match[titleIndex] || '') }
+    ? { found: true, receiptNumber: String(match[receiptIndex]), status: String(match[statusIndex] || 'Under Review'), resourceTitle: String(match[titleIndex] || '') }
     : { found: false };
   return jsonp_(callback, response);
 }
@@ -35,7 +35,7 @@ function doPost(event) {
     sheet.appendRow([
       data.receiptNumber, new Date(), data.name, data.email, data.department, data.semester,
       data.title, data.resourceType, data.subject, data.description,
-      data.resourceLink || '', data.file ? data.file.name : '', fileUrl, 'Under review'
+      data.resourceLink || '', data.file ? data.file.name : '', fileUrl, 'Under Review'
     ]);
     return json_({ ok: true });
   } catch (error) {
