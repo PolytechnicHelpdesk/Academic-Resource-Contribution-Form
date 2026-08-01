@@ -98,7 +98,7 @@ form.addEventListener('submit', async (event) => {
     delete data.otherDepartment;
     data.file = file ? { name: file.name, mimeType: file.type, base64: await readFile(file) } : null;
 
-    showUploadStatus(file ? 'Uploading your PDF to the helpdesk...' : 'Sending your resource details...');
+    showUploadStatus(file ? 'Uploading your PDF to the Polytechnic Helpdesk...' : 'Sending your resource details to the Polytechnic Helpdesk...');
     submitButton.textContent = 'Uploading resource...';
     await fetch(APPS_SCRIPT_WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
 
@@ -125,6 +125,7 @@ function downloadReceipt(data) {
   const submitted = new Date(data.submittedAt).toLocaleString();
   const gap = 5;
   const half = (contentWidth - gap) / 2;
+  const logoMark = getReceiptLogoMark();
 
   const drawCell = (x, y, width, label, value, height = 18) => {
     pdf.setFillColor(247, 250, 252);
@@ -153,11 +154,15 @@ function downloadReceipt(data) {
   pdf.setFillColor(34, 116, 185);
   pdf.rect(0, 55, pageWidth, 3, 'F');
   pdf.setFillColor(255, 255, 255);
-  pdf.roundedRect(pageWidth - 48, 12, 31, 31, 4, 4, 'F');
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(16);
-  pdf.setTextColor(18, 50, 82);
-  pdf.text('PH', pageWidth - 40.5, 31);
+  pdf.roundedRect(pageWidth - 52, 9, 36, 36, 4, 4, 'F');
+  if (logoMark) {
+    pdf.addImage(logoMark, 'JPEG', pageWidth - 48, 12, 28, 30, undefined, 'FAST');
+  } else {
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.setTextColor(18, 50, 82);
+    pdf.text('PH', pageWidth - 43.2, 31);
+  }
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(17);
   pdf.text('POLYTECHNIC HELPDESK', margin, 22);
@@ -220,6 +225,29 @@ function downloadReceipt(data) {
   pdf.text('Keep this receipt for your records. Resources are reviewed before publication.', margin, 290);
   pdf.text('Polytechnic Helpdesk - Academic Resource Contribution Portal', pageWidth - margin, 290, { align: 'right' });
   pdf.save(`${data.receiptNumber}-polytechnic-helpdesk-receipt.pdf`);
+}
+
+function getReceiptLogoMark() {
+  const logo = document.querySelector('.brand img');
+  if (!logo || !logo.complete || !logo.naturalWidth) return null;
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 430;
+    const context = canvas.getContext('2d');
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    const sourceWidth = logo.naturalWidth;
+    const sourceHeight = logo.naturalHeight;
+    context.drawImage(
+      logo,
+      sourceWidth * 0.28, sourceHeight * 0.10, sourceWidth * 0.44, sourceHeight * 0.56,
+      0, 0, canvas.width, canvas.height
+    );
+    return canvas.toDataURL('image/jpeg', 0.95);
+  } catch {
+    return null;
+  }
 }
 
 document.querySelector('#download-receipt').addEventListener('click', () => {
