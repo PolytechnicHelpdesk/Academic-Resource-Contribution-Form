@@ -121,9 +121,13 @@ form.addEventListener('submit', async (event) => {
 
 function createReceiptNumber() {
   const date = new Date();
-  const day = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
-  const random = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `PH-${day}-${random}`;
+  const day = `${String(date.getFullYear()).slice(-2)}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+  const time = `${String(date.getHours()).padStart(2, '0')}${String(date.getMinutes()).padStart(2, '0')}`;
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const values = new Uint32Array(4);
+  crypto.getRandomValues(values);
+  const random = Array.from(values, (value) => alphabet[value % alphabet.length]).join('');
+  return `PH-${day}-${time}-${random}`;
 }
 
 function downloadReceipt(data) {
@@ -324,7 +328,7 @@ statusForm.addEventListener('submit', (event) => {
     button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
     error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
   };
-  request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&prefix=${callbackName}`;
+  request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&prefix=${callbackName}&_=${Date.now()}`;
   document.head.appendChild(request);
 });
 
