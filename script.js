@@ -296,7 +296,7 @@ statusForm.addEventListener('submit', (event) => {
     finish();
     button.disabled = false;
     button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
-    error.textContent = 'The status service did not respond. Please try again.';
+    error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
   }, 12000);
 
   button.disabled = true;
@@ -321,7 +321,7 @@ statusForm.addEventListener('submit', (event) => {
     finish();
     button.disabled = false;
     button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
-    error.textContent = 'The status service could not be reached. Please try again.';
+    error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
   };
   request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&prefix=${callbackName}`;
   document.head.appendChild(request);
