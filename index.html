@@ -1,915 +1,162 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Academic Resource Contribution Form — Polytechnic Helpdesk</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-  :root{
-    --ink-navy:#0B2545;
-    --blueprint-blue:#123A5C;
-    --panel-blue:#1B4A70;
-    --paper:#F3F0E6;
-    --paper-raised:#FFFFFF;
-    --graphite:#1B2027;
-    --muted:#5C6773;
-    --sky:#A9CCE3;
-    --sky-dim:#7FA6C9;
-    --amber:#E8A33E;
-    --amber-dark:#C9821F;
-    --stamp-red:#B23A2E;
-    --hair: rgba(20,30,40,0.14);
-    --ok:#2E7D5B;
-    --radius:2px;
-    --max:760px;
-  }
-  *{box-sizing:border-box;}
-  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--graphite);
-    font-family:'IBM Plex Sans', sans-serif;
-    -webkit-font-smoothing:antialiased;
-    padding-bottom:60px;
-  }
-  h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:-0.01em;}
-  .mono{font-family:'IBM Plex Mono', monospace;}
-  a{color:var(--panel-blue);}
-  .hidden{display:none !important;}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Submit and track academic resources for Polytechnic Helpdesk." />
+    <title>Polytechnic Helpdesk | Academic Resource Contribution</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Polytechnic Helpdesk home">
+        <span class="brand-mark" aria-hidden="true">PH</span>
+        <span><strong>Polytechnic</strong><small>Helpdesk</small></span>
+      </a>
+      <a class="help-link" href="mailto:helpdesk@polytechnic.edu">Need help?</a>
+    </header>
 
-  /* ---- header ---- */
-  header.site{
-    background:var(--ink-navy);
-    color:var(--paper-raised);
-    padding:22px 0;
-  }
-  header.site .wrap{
-    max-width:var(--max);
-    margin:0 auto;
-    padding:0 22px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-  }
-  .mark{width:26px;height:26px;color:var(--amber);flex:none;}
-  .brandline{line-height:1.15;}
-  .brandline b{font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;}
-  .brandline span{display:block; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--sky-dim); font-family:'IBM Plex Mono',monospace; margin-top:2px;}
+    <main id="top">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">Academic resource portal</p>
+        <h1 id="page-title">Share knowledge.<br /><em>Strengthen learning.</em></h1>
+        <p>Contribute study material, practical files, question papers, or useful links for fellow Polytechnic students.</p>
+      </section>
 
-  /* ---- shell ---- */
-  .shell{max-width:var(--max); margin:0 auto; padding:36px 22px 0;}
-
-  /* ---- progress ---- */
-  .progress-wrap{display:flex; align-items:center; gap:14px; margin-bottom:28px;}
-  .progress-track{flex:1; height:4px; background:var(--hair); position:relative; border-radius:2px; overflow:hidden;}
-  .progress-fill{position:absolute; left:0; top:0; bottom:0; width:25%; background:var(--amber); transition:width .25s ease;}
-  .progress-label{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); white-space:nowrap;}
-
-  /* ---- cards ---- */
-  .card{background:var(--paper-raised); border:1px solid var(--hair); margin-bottom:16px; border-radius:var(--radius);}
-  .card-pad{padding:26px 28px;}
-  .banner{background:var(--panel-blue); color:#fff; padding:13px 20px; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; border-radius:var(--radius) var(--radius) 0 0;}
-  .banner + .card-pad{padding-top:20px;}
-  .helper{color:var(--muted); font-size:13.5px; line-height:1.55; margin:0 0 18px;}
-  .card-pad ul{margin:10px 0 0; padding-left:20px; color:var(--muted); font-size:14px; line-height:1.7;}
-  .card-pad ol{margin:10px 0 0; padding-left:20px; color:var(--muted); font-size:14px; line-height:1.7;}
-
-  h2.welcome-title{font-size:24px; line-height:1.3; margin-bottom:16px;}
-  .lede-block p{font-size:14.5px; line-height:1.7; color:var(--graphite); margin:0 0 14px;}
-  .note-strong{background:rgba(232,163,62,0.12); border:1px dashed var(--amber-dark); padding:14px 16px; font-size:13.5px; line-height:1.6; color:var(--graphite); margin-top:18px;}
-
-  /* ---- fields ---- */
-  .field{margin-bottom:22px;}
-  .field label{
-    display:block;
-    font-weight:600;
-    font-size:14.5px;
-    margin-bottom:4px;
-  }
-  .field label .req{color:var(--stamp-red); margin-left:3px;}
-  .field .field-help{color:var(--muted); font-size:12.5px; font-style:italic; margin:0 0 8px;}
-  .field input[type=text], .field input[type=email], .field textarea{
-    width:100%;
-    border:none;
-    border-bottom:1px solid var(--hair);
-    padding:8px 2px;
-    font-size:14.5px;
-    font-family:inherit;
-    background:transparent;
-    color:var(--graphite);
-  }
-  .field input:focus-visible, .field textarea:focus-visible{outline:none; border-bottom:2px solid var(--panel-blue); padding-bottom:7px;}
-  .field textarea{resize:vertical;}
-  .field-error{color:var(--stamp-red); font-size:12px; margin-top:6px; display:none; font-family:'IBM Plex Mono',monospace;}
-  .field.has-error .field-error{display:block;}
-  .field.has-error input, .field.has-error textarea{border-bottom-color:var(--stamp-red);}
-
-  .chip-group{display:flex; flex-wrap:wrap; gap:10px;}
-  .chip{
-    position:relative;
-  }
-  .chip input{position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer;}
-  .chip label{
-    display:block;
-    border:1px solid var(--hair);
-    padding:9px 16px;
-    font-size:13.5px;
-    font-weight:500;
-    color:var(--graphite);
-    cursor:pointer;
-    border-radius:var(--radius);
-    user-select:none;
-  }
-  .chip input:checked + label{
-    background:var(--ink-navy);
-    border-color:var(--ink-navy);
-    color:#fff;
-  }
-  .chip input:focus-visible + label{outline:2px solid var(--amber); outline-offset:2px;}
-
-  /* ---- upload ---- */
-  .upload-box{
-    border:1.5px dashed var(--hair);
-    padding:26px;
-    text-align:center;
-    border-radius:var(--radius);
-  }
-  .upload-box.dragover{border-color:var(--amber); background:rgba(232,163,62,0.06);}
-  .upload-btn{
-    display:inline-flex; align-items:center; gap:8px;
-    background:var(--ink-navy); color:#fff;
-    padding:11px 20px; border:none; cursor:pointer;
-    font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.06em; text-transform:uppercase;
-    border-radius:var(--radius);
-  }
-  .upload-btn:hover{background:var(--panel-blue);}
-  .upload-hint{color:var(--muted); font-size:12.5px; margin-top:12px;}
-  .file-chosen{
-    margin-top:16px; text-align:left;
-    background:var(--paper); border:1px solid var(--hair); padding:12px 14px;
-    font-size:13.5px; display:flex; justify-content:space-between; align-items:center; border-radius:var(--radius);
-  }
-  .file-chosen .remove{color:var(--stamp-red); cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase;}
-  .large-file-note{margin-top:12px; font-size:12.5px; color:var(--amber-dark); text-align:left; display:none;}
-  .large-file-note.show{display:block;}
-
-  .declaration-box{display:flex; gap:12px; align-items:flex-start;}
-  .declaration-box input{margin-top:4px; width:16px; height:16px; accent-color:var(--panel-blue); flex:none;}
-  .declaration-box p{font-size:13px; line-height:1.65; color:var(--muted); margin:0;}
-
-  /* ---- nav buttons ---- */
-  .nav-row{display:flex; justify-content:space-between; align-items:center; margin:24px 0 50px;}
-  .btn{
-    font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.06em; text-transform:uppercase;
-    padding:12px 24px; border:1px solid transparent; cursor:pointer; border-radius:var(--radius);
-    display:inline-flex; align-items:center; gap:8px; text-decoration:none;
-  }
-  .btn:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
-  .btn-amber{background:var(--amber); color:var(--ink-navy); font-weight:600;}
-  .btn-amber:hover{background:#f0af4d;}
-  .btn-outline{border-color:var(--hair); color:var(--graphite); background:transparent;}
-  .btn-outline:hover{border-color:var(--ink-navy);}
-  .btn[disabled]{opacity:0.45; cursor:not-allowed;}
-
-  /* ---- thank you ---- */
-  .thankyou{text-align:center; padding:60px 20px;}
-  .thankyou .stamp-ok{
-    display:inline-flex; align-items:center; justify-content:center;
-    width:60px; height:60px; border:2px solid var(--ok); border-radius:50%;
-    color:var(--ok); margin-bottom:20px;
-  }
-  .thankyou h2{font-size:24px; margin-bottom:10px;}
-  .thankyou p{color:var(--muted); font-size:14.5px; max-width:420px; margin:0 auto 26px;}
-  .thankyou .btn-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap;}
-
-  /* ---- footer ---- */
-  footer.site{max-width:var(--max); margin:0 auto; padding:20px 22px 0; display:flex; justify-content:space-between; align-items:center;}
-  footer.site .mono{font-size:11.5px; color:var(--muted); letter-spacing:0.04em;}
-  .admin-link{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted); background:none; border:none; cursor:pointer; text-decoration:underline; letter-spacing:0.04em;}
-
-  /* ---- admin ---- */
-  .admin-shell{max-width:1040px; margin:0 auto; padding:40px 22px;}
-  .admin-gate{max-width:360px; margin:80px auto; text-align:center;}
-  .admin-gate input{width:100%; border:1px solid var(--hair); padding:12px; font-size:14px; margin:16px 0; border-radius:var(--radius); font-family:'IBM Plex Mono',monospace;}
-  .admin-gate .err{color:var(--stamp-red); font-size:12.5px; display:none; margin-top:-8px; margin-bottom:14px;}
-  .admin-gate .err.show{display:block;}
-  .admin-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;}
-  .admin-actions{display:flex; gap:10px; flex-wrap:wrap;}
-  table.subs{width:100%; border-collapse:collapse; font-size:13px; background:#fff;}
-  table.subs th, table.subs td{border:1px solid var(--hair); padding:10px 12px; text-align:left; vertical-align:top;}
-  table.subs th{background:var(--ink-navy); color:#fff; font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:11px; letter-spacing:0.05em; text-transform:uppercase;}
-  table.subs tr:nth-child(even) td{background:var(--paper);}
-  .tag{display:inline-block; background:var(--paper); border:1px solid var(--hair); padding:2px 7px; border-radius:2px; font-size:11px; margin:1px 3px 1px 0;}
-  .row-actions{display:flex; gap:8px; flex-wrap:wrap;}
-  .row-actions button{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; background:none; border:1px solid var(--hair); padding:5px 8px; cursor:pointer; border-radius:2px;}
-  .row-actions button:hover{border-color:var(--panel-blue); color:var(--panel-blue);}
-  .empty-state{text-align:center; padding:60px 20px; color:var(--muted); font-size:14px;}
-  .privacy-note{background:var(--paper-raised); border:1px solid var(--hair); padding:14px 16px; font-size:12.5px; color:var(--muted); line-height:1.6; margin-bottom:22px; border-radius:var(--radius);}
-  .hp-field{position:absolute; left:-9999px; top:-9999px; width:1px; height:1px; overflow:hidden;}
-
-  @media (max-width: 560px){
-    .card-pad{padding:20px;}
-    .nav-row{flex-direction:column-reverse; gap:12px; align-items:stretch;}
-    .nav-row .btn{justify-content:center;}
-    table.subs{font-size:11.5px;}
-  }
-</style>
-</head>
-<body>
-
-<header class="site">
-  <div class="wrap">
-    <span class="mark" onclick="handleLogoClick()"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M16 2v6M16 24v6M2 16h6M24 16h6" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg></span>
-    <div class="brandline"><b>Polytechnic Helpdesk</b><span>Academic Resource Contribution Form</span></div>
-  </div>
-</header>
-
-<!-- ============ PUBLIC FORM ============ -->
-<div id="publicView">
-
-  <div class="shell">
-
-    <div class="progress-wrap">
-      <span class="progress-label" id="pageLabel">Page 1 of 4</span>
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-    </div>
-
-    <!-- STEP 1 — WELCOME -->
-    <section class="step" id="step-1">
-      <div class="card">
-        <div class="card-pad">
-          <h2 class="welcome-title">Welcome to the Polytechnic Helpdesk — Academic Resource Contribution Form</h2>
-          <div class="lede-block">
-            <p>Thank you for your interest in contributing to <b>Polytechnic Helpdesk</b>.</p>
-            <p>Your contribution plays an important role in helping Polytechnic students across Assam access quality academic resources and prepare effectively for their examinations.</p>
+      <section class="contribution-layout" aria-label="Academic resource contribution form">
+        <aside class="info-panel">
+          <div>
+            <p class="panel-label">Before you contribute</p>
+            <h2>Good resources make a difference.</h2>
+            <ul>
+              <li>Submit only material you are allowed to share.</li>
+              <li>Use clear filenames and accurate subject details.</li>
+              <li>Our academic team reviews every contribution.</li>
+            </ul>
           </div>
-          <p style="font-weight:600; font-size:14.5px; margin-bottom:0;">Through this form, you can submit:</p>
-          <ul>
-            <li>Study Materials</li>
-            <li>Previous Year Question Papers (PYQs)</li>
-            <li>Notes</li>
-            <li>Lab Manuals</li>
-            <li>Practical Files</li>
-            <li>Assignments</li>
-            <li>E-Books</li>
-            <li>Other academic resources</li>
-          </ul>
-          <p style="font-weight:600; font-size:14.5px; margin:20px 0 0;">Before you submit, please ensure that:</p>
-          <ol>
-            <li>The uploaded material is relevant to Polytechnic education.</li>
-            <li>The files are clear, complete, and in readable condition.</li>
-            <li>You have the right or permission to share the material.</li>
-            <li>You do not upload copyrighted or confidential content without authorization.</li>
-          </ol>
-          <div class="note-strong"><b>Please note:</b> All submissions will be reviewed before publication. Polytechnic Helpdesk reserves the right to accept, edit, organize, or reject any submission that does not meet our guidelines.</div>
-          <p style="margin-top:18px; font-size:13.5px; color:var(--muted);">Thank you for helping us build a reliable and comprehensive learning resource for Polytechnic students. Your support is sincerely appreciated.</p>
-        </div>
-      </div>
-      <div class="nav-row">
-        <span></span>
-        <button class="btn btn-amber" onclick="goToStep(2)">Next →</button>
-      </div>
-    </section>
+          <p class="privacy-note"><span aria-hidden="true">⌁</span> Your contact details are used only to review this submission.</p>
+        </aside>
 
-    <!-- STEP 2 — CONTRIBUTOR INFO -->
-    <section class="step hidden" id="step-2">
-      <div class="card">
-        <div class="banner">Contributor Information</div>
-        <div class="card-pad">
-          <p class="helper">Please provide your basic information. This helps us verify submissions and contact you if any clarification regarding the uploaded material is required. Your personal information will not be published without your permission.</p>
-
-          <div class="field">
-            <label for="fullName">Full Name</label>
-            <input type="text" id="fullName">
-          </div>
-
-          <div class="field" id="field-email">
-            <label for="email">Email Address<span class="req">*</span></label>
-            <input type="email" id="email">
-            <div class="field-error">Please enter a valid email address.</div>
-          </div>
-
-          <div class="field" id="field-institution">
-            <label for="institution">Institution Name<span class="req">*</span></label>
-            <input type="text" id="institution">
-            <div class="field-error">Please enter your institution name.</div>
-          </div>
-
-          <div class="field" id="field-branch">
-            <label>Branch<span class="req">*</span></label>
-            <div class="chip-group">
-              <span class="chip"><input type="radio" id="b-civil" name="branch" value="Civil Engineering"><label for="b-civil">Civil Engineering</label></span>
-              <span class="chip"><input type="radio" id="b-elec" name="branch" value="Electrical Engineering"><label for="b-elec">Electrical Engineering</label></span>
-              <span class="chip"><input type="radio" id="b-mech" name="branch" value="Mechanical Engineering"><label for="b-mech">Mechanical Engineering</label></span>
-              <span class="chip"><input type="radio" id="b-comp" name="branch" value="Computer Engineering"><label for="b-comp">Computer Engineering</label></span>
-              <span class="chip"><input type="radio" id="b-chem" name="branch" value="Chemical Engineering"><label for="b-chem">Chemical Engineering</label></span>
-              <span class="chip"><input type="radio" id="b-etc" name="branch" value="Electronics & Telecommunication"><label for="b-etc">Electronics &amp; Telecommunication</label></span>
+        <div class="form-card">
+          <div class="form-heading">
+            <div>
+              <p class="eyebrow">Contribution form</p>
+              <h2>Tell us about your resource</h2>
             </div>
-            <div class="field-error">Please select your branch.</div>
+            <p class="required-note"><span>*</span> Required fields</p>
           </div>
 
-          <div class="field" id="field-semester" style="margin-bottom:0;">
-            <label>Semester<span class="req">*</span></label>
-            <div class="chip-group">
-              <span class="chip"><input type="radio" id="s-1" name="semester" value="1st Semester"><label for="s-1">1st Semester</label></span>
-              <span class="chip"><input type="radio" id="s-2" name="semester" value="2nd Semester"><label for="s-2">2nd Semester</label></span>
-              <span class="chip"><input type="radio" id="s-3" name="semester" value="3rd Semester"><label for="s-3">3rd Semester</label></span>
-              <span class="chip"><input type="radio" id="s-4" name="semester" value="4th Semester"><label for="s-4">4th Semester</label></span>
-              <span class="chip"><input type="radio" id="s-5" name="semester" value="5th Semester"><label for="s-5">5th Semester</label></span>
-              <span class="chip"><input type="radio" id="s-6" name="semester" value="6th Semester"><label for="s-6">6th Semester</label></span>
-              <span class="chip"><input type="radio" id="s-po" name="semester" value="Passed Out"><label for="s-po">Passed Out</label></span>
-            </div>
-            <div class="field-error">Please select your semester.</div>
-          </div>
-        </div>
-      </div>
-      <div class="nav-row">
-        <button class="btn btn-outline" onclick="goToStep(1)">← Back</button>
-        <button class="btn btn-amber" onclick="validateAndGo(2,3)">Next →</button>
-      </div>
-    </section>
-
-    <!-- STEP 3 — RESOURCE INFO -->
-    <section class="step hidden" id="step-3">
-      <div class="card">
-        <div class="banner">Resource Information</div>
-        <div class="card-pad">
-          <p class="helper">Please provide details about the academic resource you are submitting. Accurate information helps us organize and categorize the material correctly, making it easier for students to find the resources they need.</p>
-
-          <div class="field" id="field-resourceType">
-            <label>Resource Type<span class="req">*</span></label>
-            <div class="chip-group">
-              <span class="chip"><input type="radio" id="rt-pyq" name="resourceType" value="Previous Year Question Papers (PYQs)"><label for="rt-pyq">Previous Year Question Papers (PYQs)</label></span>
-              <span class="chip"><input type="radio" id="rt-notes" name="resourceType" value="Notes"><label for="rt-notes">Notes</label></span>
-              <span class="chip"><input type="radio" id="rt-ebook" name="resourceType" value="eBooks"><label for="rt-ebook">eBooks</label></span>
-              <span class="chip"><input type="radio" id="rt-lab" name="resourceType" value="Lab Manual"><label for="rt-lab">Lab Manual</label></span>
-              <span class="chip"><input type="radio" id="rt-prac" name="resourceType" value="Practical File"><label for="rt-prac">Practical File</label></span>
-              <span class="chip"><input type="radio" id="rt-assign" name="resourceType" value="Assignment"><label for="rt-assign">Assignment</label></span>
-              <span class="chip"><input type="radio" id="rt-syll" name="resourceType" value="Syllabus"><label for="rt-syll">Syllabus</label></span>
-              <span class="chip"><input type="radio" id="rt-other" name="resourceType" value="Other"><label for="rt-other">Other</label></span>
-            </div>
-            <div class="field-error">Please select a resource type.</div>
-          </div>
-
-          <div class="field" id="field-subjectName">
-            <label for="subjectName">Subject Name<span class="req">*</span></label>
-            <p class="field-help">Please enter the name of the subject to which the uploaded resource belongs.</p>
-            <input type="text" id="subjectName">
-            <div class="field-error">Please enter the subject name.</div>
-          </div>
-
-          <div class="field" id="field-resourceSemester">
-            <label for="resourceSemester">Semester<span class="req">*</span></label>
-            <p class="field-help">Please mention the semester to which the uploaded resource belongs.</p>
-            <input type="text" id="resourceSemester">
-            <div class="field-error">Please mention the semester.</div>
-          </div>
-
-          <div class="field" id="field-resourceDetails" style="margin-bottom:0;">
-            <label for="resourceDetails">Resource Details<span class="req">*</span></label>
-            <p class="field-help">Please provide details about the resource you are submitting. Accurate information helps us organize and categorize the material correctly, making it easier for students to find the resources they need.</p>
-            <input type="text" id="resourceDetails">
-            <div class="field-error">Please add a short description.</div>
-          </div>
-        </div>
-      </div>
-      <div class="nav-row">
-        <button class="btn btn-outline" onclick="goToStep(2)">← Back</button>
-        <button class="btn btn-amber" onclick="validateAndGo(3,4)">Next →</button>
-      </div>
-    </section>
-
-    <!-- STEP 4 — UPLOAD + DECLARATION -->
-    <section class="step hidden" id="step-4">
-      <div class="card">
-        <div class="banner">Upload Academic Resource</div>
-        <div class="card-pad">
-          <p class="helper">Upload the academic resource you wish to contribute. Please ensure that the uploaded file is complete, clear, and in good quality.</p>
-          <ul style="margin-bottom:6px;">
-            <li><b>Supported file types:</b> PDF (recommended), DOCX, PPT / PPTX, JPG / PNG (only if necessary)</li>
-            <li><b>Maximum file size:</b> 50MB per file</li>
-          </ul>
-
-          <div class="field" id="field-file" style="margin-top:20px;">
-            <label>Upload Resource<span class="req">*</span></label>
-            <div class="upload-box" id="uploadBox">
-              <button type="button" class="upload-btn" onclick="document.getElementById('fileInput').click()">↑ Add File</button>
-              <div class="upload-hint">PDF, DOCX, PPT/PPTX, JPG or PNG</div>
-              <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" style="display:none">
-              <div class="file-chosen hidden" id="fileChosen">
-                <span id="fileChosenName"></span>
-                <span class="remove" onclick="clearFile()">Remove</span>
+          <form id="resource-form" novalidate>
+            <fieldset>
+              <legend>Contributor details</legend>
+              <div class="form-grid two-columns">
+                <label>Full name <span>*</span>
+                  <input name="name" type="text" autocomplete="name" required placeholder="Your full name" />
+                  <small class="error-message"></small>
+                </label>
+                <label>College email <span>*</span>
+                  <input name="email" type="email" autocomplete="email" required placeholder="name@college.edu" />
+                  <small class="error-message"></small>
+                </label>
+                <label>Enrollment number
+                  <input name="enrollmentNumber" type="text" placeholder="e.g. 2024-12345" />
+                </label>
+                <label>Department <span>*</span>
+                  <select name="department" required>
+                    <option value="">Select department</option>
+                    <option>Computer Engineering</option>
+                    <option>Information Technology</option>
+                    <option>Mechanical Engineering</option>
+                    <option>Civil Engineering</option>
+                    <option>Electrical Engineering</option>
+                    <option>Electronics &amp; Communication</option>
+                    <option>Other</option>
+                  </select>
+                  <small class="error-message"></small>
+                </label>
               </div>
-              <div class="large-file-note" id="largeFileNote">This file is large for this demo's built-in storage. We'll record its name and details with your submission — please also email the file itself to <b>mansumandas283@gmail.com</b> so it isn't lost, or ask the admin to connect real cloud storage.</div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Resource details</legend>
+              <div class="form-grid two-columns">
+                <label>Resource title <span>*</span>
+                  <input name="title" type="text" required maxlength="100" placeholder="e.g. Applied Mathematics II notes" />
+                  <small class="error-message"></small>
+                </label>
+                <label>Resource type <span>*</span>
+                  <select name="resourceType" required>
+                    <option value="">Select type</option>
+                    <option>Lecture notes</option>
+                    <option>Practical / lab file</option>
+                    <option>Previous question paper</option>
+                    <option>Assignment / project</option>
+                    <option>Reference link</option>
+                    <option>Other</option>
+                  </select>
+                  <small class="error-message"></small>
+                </label>
+                <label>Semester <span>*</span>
+                  <select name="semester" required>
+                    <option value="">Select semester</option>
+                    <option>Semester 1</option><option>Semester 2</option><option>Semester 3</option>
+                    <option>Semester 4</option><option>Semester 5</option><option>Semester 6</option>
+                  </select>
+                  <small class="error-message"></small>
+                </label>
+                <label>Subject / course <span>*</span>
+                  <input name="subject" type="text" required placeholder="Subject name or code" />
+                  <small class="error-message"></small>
+                </label>
+              </div>
+              <label>Description <span>*</span>
+                <textarea name="description" required maxlength="500" rows="4" placeholder="Briefly explain what this resource contains and how it can help students."></textarea>
+                <span class="field-hint"><span class="error-message"></span><span><b id="description-count">0</b>/500</span></span>
+              </label>
+              <div class="form-grid two-columns file-area">
+                <label>Resource file
+                  <span class="file-picker"><input id="resource-file" name="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,image/*" /><span>Choose file</span></span>
+                  <small id="file-name">PDF, DOCX, PPTX, XLSX, ZIP or image · max 10 MB</small>
+                </label>
+                <label>Or resource link
+                  <input name="resourceLink" type="url" placeholder="https://..." />
+                  <small>Paste a Drive, OneDrive, or public web link.</small>
+                </label>
+              </div>
+              <p id="file-link-error" class="error-message group-error" aria-live="polite"></p>
+            </fieldset>
+
+            <label class="consent">
+              <input name="consent" type="checkbox" required />
+              <span>I confirm that I have permission to share this resource and that the information provided is accurate. <b>*</b></span>
+            </label>
+            <small class="error-message consent-error"></small>
+
+            <div class="form-actions">
+              <button type="submit">Submit contribution <span aria-hidden="true">→</span></button>
+              <p>Resources are reviewed before publication.</p>
             </div>
-            <div class="field-error">Please choose a file to upload.</div>
-          </div>
-
-          <div class="hp-field" aria-hidden="true">
-            <label for="website">Leave this field blank</label>
-            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
-          </div>
-
-          <div class="field" id="field-declaration" style="margin-bottom:0; margin-top:26px;">
-            <div class="declaration-box">
-              <input type="checkbox" id="declaration">
-              <p>I hereby declare that I have the necessary rights or permission to share the uploaded academic resource. By submitting this form, I voluntarily grant Polytechnic Helpdesk permission to review, organize, edit (if necessary), reproduce, publish, and make the submitted resource available on the Polytechnic Helpdesk website and its associated platforms for educational and non-commercial purposes. I understand that Polytechnic Helpdesk may accept or reject any submission at its sole discretion.</p>
-            </div>
-            <div class="field-error">Please confirm the declaration to continue.</div>
-          </div>
+          </form>
         </div>
+      </section>
+    </main>
+
+    <footer>© <span id="year"></span> Polytechnic Helpdesk · Academic Resource Centre</footer>
+
+    <dialog id="success-dialog" aria-labelledby="success-title">
+      <div class="success-icon" aria-hidden="true">✓</div>
+      <p class="eyebrow">Contribution received</p>
+      <h2 id="success-title">Thank you for sharing.</h2>
+      <p>Your reference number is <strong id="reference-number"></strong>. We will review the resource and contact you if we need more details.</p>
+      <div class="dialog-actions">
+        <button id="download-receipt" class="secondary" type="button">Download receipt</button>
+        <button id="close-dialog" type="button">Done</button>
       </div>
-      <div class="nav-row">
-        <button class="btn btn-outline" onclick="goToStep(3)">← Back</button>
-        <button class="btn btn-amber" id="submitBtn" onclick="submitForm()">Submit ▸</button>
-      </div>
-    </section>
+    </dialog>
 
-    <!-- THANK YOU -->
-    <section class="step hidden" id="step-5">
-      <div class="thankyou">
-        <div class="stamp-ok"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <h2>Thanks for submitting!</h2>
-        <p>Your response has been recorded. Our team reviews every submission before it's published — if we need to reach you, we'll use the email you provided.</p>
-        <div class="btn-row">
-          <button class="btn btn-amber" onclick="downloadReceipt()">Download PDF receipt</button>
-          <button class="btn btn-outline" onclick="resetForm()">Submit another response</button>
-        </div>
-      </div>
-    </section>
-
-  </div>
-
-  <footer class="site">
-    <span class="mono">© Polytechnic Helpdesk</span>
-  </footer>
-
-</div>
-
-<!-- ============ ADMIN VIEW ============ -->
-<div id="adminView" class="hidden">
-
-  <div class="admin-gate" id="adminGate">
-    <h2 style="font-size:20px; margin-bottom:6px;">Admin access</h2>
-    <p style="color:var(--muted); font-size:13px; margin:0;">Enter the admin passcode to view submissions.</p>
-    <input type="password" id="adminPasscode" placeholder="Passcode" onkeydown="if(event.key==='Enter')checkPasscode()">
-    <div class="err" id="adminErr">Incorrect passcode.</div>
-    <button class="btn btn-amber" style="width:100%; justify-content:center;" onclick="checkPasscode()">Unlock</button>
-    <button class="btn btn-outline" style="width:100%; justify-content:center; margin-top:10px;" onclick="closeAdmin()">Back to form</button>
-  </div>
-
-  <div class="admin-shell hidden" id="adminDashboard">
-    <div class="admin-top">
-      <h2 style="font-size:22px;">Submissions</h2>
-      <div class="admin-actions">
-        <button class="btn btn-outline" onclick="loadSubmissions()">↻ Refresh</button>
-        <button class="btn btn-outline" onclick="exportAllPDF()">Export all as PDF</button>
-        <button class="btn btn-outline" onclick="closeAdmin()">Close</button>
-      </div>
-    </div>
-    <div class="privacy-note">This list is stored in shared storage for this page — anyone who has the admin passcode and opens this page can see every response below, including uploaded file names. Change the passcode in the page's source before sharing this link with your team.</div>
-    <div id="subsTableWrap"></div>
-  </div>
-
-</div>
-
-<script>
-  const ADMIN_PASSCODE_B64 = "aGVscGRlc2syMDI2"; // encoded "helpdesk2026" — to change it, replace this with the output of btoa("yourNewPasscode") in a browser console
-  let logoClickCount = 0, logoClickTimer = null;
-  function handleLogoClick(){
-    logoClickCount++;
-    clearTimeout(logoClickTimer);
-    logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 1500);
-    if(logoClickCount >= 5){
-      logoClickCount = 0;
-      openAdmin();
-    }
-  }
-  const MAX_EMBED_BYTES = 1.5 * 1024 * 1024; // kept well under the 5MB storage cap once encryption + base64 overhead is added
-
-  /* ---------------- ENCRYPTION ----------------
-     Every submission is encrypted (AES-GCM, 256-bit) with a key derived from the
-     admin passcode via PBKDF2 before it ever reaches storage. Anyone poking at the
-     raw storage directly (e.g. from the browser console) sees ciphertext, not
-     readable answers — the passcode screen is no longer just a UI toggle sitting
-     in front of plain-text data.
-     Real limit, stated plainly: this still all runs in the visitor's browser, so
-     the passcode — and therefore the key — lives in this file's source. Someone
-     who reads the JavaScript, rather than just prodding at storage, can still
-     reconstruct it. That's an inherent ceiling for any client-only page; genuine
-     secrecy needs a server that holds the key and the browser never sees it. */
-  const CRYPTO_SALT = new TextEncoder().encode('polytechnic-helpdesk-salt-v1');
-
-  function bytesToBase64(bytes){
-    let binary = '';
-    const chunk = 0x8000;
-    for(let i = 0; i < bytes.length; i += chunk){
-      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
-    }
-    return btoa(binary);
-  }
-  function base64ToBytes(b64){
-    const binary = atob(b64);
-    const bytes = new Uint8Array(binary.length);
-    for(let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    return bytes;
-  }
-
-  let cachedKey = null;
-  async function getCryptoKey(){
-    if(cachedKey) return cachedKey;
-    const passcode = atob(ADMIN_PASSCODE_B64);
-    const baseKey = await crypto.subtle.importKey(
-      'raw', new TextEncoder().encode(passcode), 'PBKDF2', false, ['deriveKey']
-    );
-    cachedKey = await crypto.subtle.deriveKey(
-      { name:'PBKDF2', salt:CRYPTO_SALT, iterations:100000, hash:'SHA-256' },
-      baseKey,
-      { name:'AES-GCM', length:256 },
-      false,
-      ['encrypt','decrypt']
-    );
-    return cachedKey;
-  }
-
-  async function encryptRecord(obj){
-    const key = await getCryptoKey();
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const data = new TextEncoder().encode(JSON.stringify(obj));
-    const cipherBuf = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, data);
-    return { iv: bytesToBase64(iv), data: bytesToBase64(new Uint8Array(cipherBuf)) };
-  }
-
-  async function decryptRecord(payload){
-    const key = await getCryptoKey();
-    const iv = base64ToBytes(payload.iv);
-    const cipherBytes = base64ToBytes(payload.data);
-    const plainBuf = await crypto.subtle.decrypt({ name:'AES-GCM', iv }, key, cipherBytes);
-    return JSON.parse(new TextDecoder().decode(plainBuf));
-  }
-
-  /* ---------------- STEP NAVIGATION ---------------- */
-  function goToStep(n){
-    document.querySelectorAll('.step').forEach(s => s.classList.add('hidden'));
-    document.getElementById('step-' + n).classList.remove('hidden');
-    document.getElementById('pageLabel').textContent = 'Page ' + Math.min(n,4) + ' of 4';
-    document.getElementById('progressFill').style.width = (Math.min(n,4) / 4 * 100) + '%';
-    window.scrollTo({top:0, behavior:'instant'});
-  }
-
-  function setError(fieldId, show){
-    const el = document.getElementById(fieldId);
-    if(!el) return;
-    el.classList.toggle('has-error', show);
-  }
-
-  function anyChecked(name){
-    return document.querySelectorAll('input[name="'+name+'"]:checked').length > 0;
-  }
-
-  function validateAndGo(fromStep, toStep){
-    let ok = true;
-
-    if(fromStep === 2){
-      const email = document.getElementById('email').value.trim();
-      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      setError('field-email', !emailOk); if(!emailOk) ok = false;
-
-      const inst = document.getElementById('institution').value.trim();
-      setError('field-institution', inst.length === 0); if(inst.length === 0) ok = false;
-
-      const branchOk = anyChecked('branch');
-      setError('field-branch', !branchOk); if(!branchOk) ok = false;
-
-      const semOk = anyChecked('semester');
-      setError('field-semester', !semOk); if(!semOk) ok = false;
-    }
-
-    if(fromStep === 3){
-      const rtOk = anyChecked('resourceType');
-      setError('field-resourceType', !rtOk); if(!rtOk) ok = false;
-
-      const subj = document.getElementById('subjectName').value.trim();
-      setError('field-subjectName', subj.length === 0); if(subj.length === 0) ok = false;
-
-      const rsem = document.getElementById('resourceSemester').value.trim();
-      setError('field-resourceSemester', rsem.length === 0); if(rsem.length === 0) ok = false;
-
-      const det = document.getElementById('resourceDetails').value.trim();
-      setError('field-resourceDetails', det.length === 0); if(det.length === 0) ok = false;
-    }
-
-    if(ok) goToStep(toStep);
-  }
-
-  /* ---------------- FILE HANDLING ---------------- */
-  let selectedFile = null; // { name, type, size, dataUrl|null, tooLarge }
-
-  document.getElementById('fileInput').addEventListener('change', function(e){
-    const f = e.target.files[0];
-    if(!f) return;
-    const tooLarge = f.size > MAX_EMBED_BYTES;
-    document.getElementById('largeFileNote').classList.toggle('show', tooLarge);
-
-    const finish = (dataUrl) => {
-      selectedFile = { name:f.name, type:f.type || 'unknown', size:f.size, dataUrl: dataUrl, tooLarge: tooLarge };
-      document.getElementById('fileChosenName').textContent = f.name + ' (' + formatBytes(f.size) + ')';
-      document.getElementById('fileChosen').classList.remove('hidden');
-      setError('field-file', false);
-    };
-
-    if(tooLarge){
-      finish(null);
-    } else {
-      const reader = new FileReader();
-      reader.onload = () => finish(reader.result);
-      reader.onerror = () => finish(null);
-      reader.readAsDataURL(f);
-    }
-  });
-
-  function clearFile(){
-    selectedFile = null;
-    document.getElementById('fileInput').value = '';
-    document.getElementById('fileChosen').classList.add('hidden');
-    document.getElementById('largeFileNote').classList.remove('show');
-  }
-
-  function formatBytes(bytes){
-    if(bytes < 1024) return bytes + ' B';
-    if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
-    return (bytes/(1024*1024)).toFixed(1) + ' MB';
-  }
-
-  /* ---------------- SUBMIT ---------------- */
-  let lastRecord = null;
-
-  async function submitForm(){
-    // Honeypot: real visitors never see or reach this field. If it's filled, it's
-    // almost certainly a bot — pretend success without saving anything, so there's
-    // no error message for it to learn from.
-    const honeypot = document.getElementById('website');
-    if(honeypot && honeypot.value){
-      goToStep(5);
-      return;
-    }
-
-    let ok = true;
-
-    setError('field-file', !selectedFile); if(!selectedFile) ok = false;
-    const declOk = document.getElementById('declaration').checked;
-    setError('field-declaration', !declOk); if(!declOk) ok = false;
-
-    if(!ok) return;
-
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Submitting…';
-
-    const record = {
-      id: 'sub_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
-      submittedAt: new Date().toISOString(),
-      fullName: document.getElementById('fullName').value.trim(),
-      email: document.getElementById('email').value.trim().toLowerCase(),
-      institution: document.getElementById('institution').value.trim(),
-      branch: Array.from(document.querySelectorAll('input[name="branch"]:checked')).map(i=>i.value),
-      semester: Array.from(document.querySelectorAll('input[name="semester"]:checked')).map(i=>i.value),
-      resourceType: Array.from(document.querySelectorAll('input[name="resourceType"]:checked')).map(i=>i.value),
-      subjectName: document.getElementById('subjectName').value.trim(),
-      resourceSemester: document.getElementById('resourceSemester').value.trim(),
-      resourceDetails: document.getElementById('resourceDetails').value.trim(),
-      fileName: selectedFile.name,
-      fileType: selectedFile.type,
-      fileSize: selectedFile.size,
-      fileDataUrl: selectedFile.dataUrl,
-      fileTooLarge: selectedFile.tooLarge,
-      declaration: true
-    };
-
-    try{
-      const encrypted = await encryptRecord(record);
-      await window.storage.set('submissions:' + record.id, JSON.stringify(encrypted), true);
-    }catch(err){
-      console.error('Storage error:', err);
-      alert('Something went wrong saving your response. Please try submitting again.');
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit ▸';
-      return;
-    }
-
-    lastRecord = record;
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Submit ▸';
-    goToStep(5);
-  }
-
-  function resetForm(){
-    document.querySelectorAll('#publicView input[type=text], #publicView input[type=email]').forEach(i => i.value = '');
-    document.querySelectorAll('#publicView input[type=checkbox]').forEach(i => i.checked = false);
-    clearFile();
-    document.querySelectorAll('.field').forEach(f => f.classList.remove('has-error'));
-    lastRecord = null;
-    goToStep(1);
-  }
-
-  /* ---------------- PDF GENERATION ---------------- */
-  function writeRecordToDoc(doc, record, startY){
-    const { jsPDF } = window.jspdf;
-    let y = startY;
-    const left = 40;
-    const width = 515;
-
-    doc.setFont('helvetica','bold'); doc.setFontSize(14);
-    doc.text('Polytechnic Helpdesk — Resource Contribution', left, y); y += 18;
-    doc.setDrawColor(180); doc.line(left, y, left+width, y); y += 16;
-
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(110);
-    doc.text('Submitted: ' + new Date(record.submittedAt).toLocaleString(), left, y); y += 8;
-    doc.text('Submission ID: ' + record.id, left, y); y += 16;
-
-    const row = (label, value) => {
-      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(20);
-      doc.text(label, left, y);
-      doc.setFont('helvetica','normal'); doc.setTextColor(60);
-      const lines = doc.splitTextToSize(value || '—', width - 150);
-      doc.text(lines, left + 150, y);
-      y += Math.max(14, lines.length * 12);
-    };
-
-    row('Full Name', record.fullName || '—');
-    row('Email', record.email);
-    row('Institution', record.institution);
-    row('Branch', record.branch.join(', '));
-    row('Semester', record.semester.join(', '));
-    y += 6;
-    row('Resource Type', record.resourceType.join(', '));
-    row('Subject Name', record.subjectName);
-    row('Resource Semester', record.resourceSemester);
-    row('Resource Details', record.resourceDetails);
-    y += 6;
-    row('Uploaded File', record.fileName + '  (' + formatBytes(record.fileSize) + ')');
-    if(record.fileTooLarge){
-      row('File Storage', 'Not embedded — too large for demo storage. Contact contributor for the file.');
-    } else {
-      row('File Storage', 'Embedded with this submission.');
-    }
-    row('Declaration', 'Contributor confirmed rights/permission to share.');
-
-    return y + 10;
-  }
-
-  function downloadReceipt(){
-    if(!lastRecord) return;
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    writeRecordToDoc(doc, lastRecord, 40);
-    doc.save('submission-receipt-' + lastRecord.id + '.pdf');
-  }
-
-  /* ---------------- ADMIN ---------------- */
-  function openAdmin(){
-    document.getElementById('publicView').classList.add('hidden');
-    document.getElementById('adminView').classList.remove('hidden');
-    document.getElementById('adminGate').classList.remove('hidden');
-    document.getElementById('adminDashboard').classList.add('hidden');
-    document.getElementById('adminPasscode').value = '';
-    document.getElementById('adminErr').classList.remove('show');
-  }
-  function closeAdmin(){
-    document.getElementById('adminView').classList.add('hidden');
-    document.getElementById('publicView').classList.remove('hidden');
-  }
-  let failedAttempts = 0, lockUntil = 0;
-
-  function showAdminErr(msg){
-    const el = document.getElementById('adminErr');
-    el.textContent = msg;
-    el.classList.add('show');
-  }
-
-  function checkPasscode(){
-    const now = Date.now();
-    if(now < lockUntil){
-      showAdminErr('Too many attempts — try again in ' + Math.ceil((lockUntil - now) / 1000) + 's.');
-      return;
-    }
-    const val = document.getElementById('adminPasscode').value;
-    if(val === atob(ADMIN_PASSCODE_B64)){
-      failedAttempts = 0;
-      document.getElementById('adminGate').classList.add('hidden');
-      document.getElementById('adminDashboard').classList.remove('hidden');
-      loadSubmissions();
-    } else {
-      failedAttempts++;
-      if(failedAttempts >= 5){
-        lockUntil = now + 30000;
-        showAdminErr('Too many attempts — try again in 30s.');
-      } else {
-        showAdminErr('Incorrect passcode.');
-      }
-    }
-  }
-
-  let allSubmissions = [];
-
-  async function loadSubmissions(){
-    const wrap = document.getElementById('subsTableWrap');
-    wrap.innerHTML = '<p style="color:var(--muted); font-size:13px;">Loading and decrypting…</p>';
-    try{
-      const listResult = await window.storage.list('submissions:', true);
-      const keys = (listResult && listResult.keys) ? listResult.keys : [];
-      const records = [];
-      for(const k of keys){
-        try{
-          const r = await window.storage.get(k, true);
-          if(r && r.value){
-            const payload = JSON.parse(r.value);
-            const rec = await decryptRecord(payload);
-            records.push(rec);
-          }
-        }catch(e){ /* skip entries that fail to decrypt or parse */ }
-      }
-      records.sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-      allSubmissions = records;
-      renderTable(records);
-    }catch(err){
-      console.error('Load error:', err);
-      wrap.innerHTML = '<p style="color:var(--stamp-red); font-size:13px;">Could not load submissions.</p>';
-    }
-  }
-
-  function renderTable(records){
-    const wrap = document.getElementById('subsTableWrap');
-    if(records.length === 0){
-      wrap.innerHTML = '<div class="empty-state">No submissions yet. They\'ll show up here as students submit the form.</div>';
-      return;
-    }
-    let html = '<table class="subs"><thead><tr>' +
-      '<th>Submitted</th><th>Name</th><th>Email</th><th>Institution</th><th>Branch</th><th>Semester</th><th>Resource</th><th>File</th><th>Actions</th>' +
-      '</tr></thead><tbody>';
-    records.forEach(r => {
-      html += '<tr>' +
-        '<td>' + new Date(r.submittedAt).toLocaleString() + '</td>' +
-        '<td>' + escapeHtml(r.fullName || '—') + '</td>' +
-        '<td>' + escapeHtml(r.email) + '</td>' +
-        '<td>' + escapeHtml(r.institution) + '</td>' +
-        '<td>' + r.branch.map(b=>'<span class="tag">'+escapeHtml(b)+'</span>').join('') + '</td>' +
-        '<td>' + r.semester.map(s=>'<span class="tag">'+escapeHtml(s)+'</span>').join('') + '</td>' +
-        '<td>' + escapeHtml(r.subjectName) + '<br><span style="color:var(--muted)">' + r.resourceType.map(escapeHtml).join(', ') + '</span></td>' +
-        '<td>' + escapeHtml(r.fileName) + '<br><span style="color:var(--muted)">' + formatBytes(r.fileSize) + (r.fileTooLarge ? ' — not embedded' : '') + '</span></td>' +
-        '<td class="row-actions">' +
-          '<button onclick="downloadOnePDF(\'' + r.id + '\')">PDF</button>' +
-          (r.fileDataUrl ? '<button onclick="downloadOriginalFile(\'' + r.id + '\')">File</button>' : '') +
-        '</td>' +
-        '</tr>';
-    });
-    html += '</tbody></table>';
-    wrap.innerHTML = html;
-  }
-
-  function escapeHtml(str){
-    return String(str == null ? '' : str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  function downloadOnePDF(id){
-    const record = allSubmissions.find(r => r.id === id);
-    if(!record) return;
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    writeRecordToDoc(doc, record, 40);
-    doc.save('submission-' + id + '.pdf');
-  }
-
-  function downloadOriginalFile(id){
-    const record = allSubmissions.find(r => r.id === id);
-    if(!record || !record.fileDataUrl) return;
-    const a = document.createElement('a');
-    a.href = record.fileDataUrl;
-    a.download = record.fileName;
-    a.click();
-  }
-
-  function exportAllPDF(){
-    if(allSubmissions.length === 0) return;
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFont('helvetica','bold'); doc.setFontSize(16);
-    doc.text('Polytechnic Helpdesk — All Submissions', 40, 44);
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(110);
-    doc.text('Exported: ' + new Date().toLocaleString() + '  ·  ' + allSubmissions.length + ' submission(s)', 40, 58);
-
-    allSubmissions.forEach((record, idx) => {
-      doc.addPage();
-      writeRecordToDoc(doc, record, 40);
-    });
-    doc.save('all-submissions-' + Date.now() + '.pdf');
-  }
-</script>
-
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
