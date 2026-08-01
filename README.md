@@ -7,6 +7,7 @@ A static, responsive contribution form designed for GitHub Pages.
 - Professional custom-designed form hosted directly on the website
 - PDF uploads are saved to the administrator's Google Drive
 - Submission details and Drive links are added to the connected spreadsheet
+- A branded PDF receipt is generated for the contributor after submission
 
 ## Publish with GitHub Pages
 
