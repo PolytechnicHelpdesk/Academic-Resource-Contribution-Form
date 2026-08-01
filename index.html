@@ -65,6 +65,7 @@
                 <label>Email <b>*</b><input name="email" type="email" autocomplete="email" required placeholder="name@example.com" /><small class="error-message"></small></label>
                 <label>Department <b>*</b><select name="department" required><option value="">Select your department</option><option>Computer Engineering</option><option>Chemical Engineering</option><option>Mechanical Engineering</option><option>Civil Engineering</option><option>Electrical Engineering</option><option>Electronic &amp; Telecommunication</option><option>Other</option></select><small class="error-message"></small></label>
                 <label>Semester <b>*</b><select name="semester" required><option value="">Select your semester</option><option>Semester 1</option><option>Semester 2</option><option>Semester 3</option><option>Semester 4</option><option>Semester 5</option><option>Semester 6</option><option>Passed Out</option></select><small class="error-message"></small></label>
+                <label id="other-department-field" class="full-row conditional-field" hidden>Department name <b>*</b><input name="otherDepartment" type="text" placeholder="Enter your department name" /><small class="error-message"></small></label>
               </div>
             </fieldset>
 
@@ -72,7 +73,7 @@
               <legend><span>2</span> Resource information</legend>
               <div class="form-grid two-columns">
                 <label>Resource title <b>*</b><input name="title" type="text" required maxlength="100" placeholder="e.g. Applied Mathematics II notes" /><small class="error-message"></small></label>
-                <label>Resource type <b>*</b><select name="resourceType" required><option value="">Choose a resource type</option><option>Lecture notes</option><option>Practical / lab file</option><option>Previous question paper</option><option>Assignment / project</option><option>Reference link</option><option>Other</option></select><small class="error-message"></small></label>
+                <label>Resource type <b>*</b><select name="resourceType" required><option value="">Choose a resource type</option><option>Notifications</option><option>Syllabus</option><option>Handwritten notes</option><option>Lecture notes</option><option>Practical / lab file</option><option>Previous question paper</option><option>Assignment / project</option><option>Reference link</option><option>Other</option></select><small class="error-message"></small></label>
                 <label class="full-row">Subject / course <b>*</b><input name="subject" type="text" required placeholder="Enter the subject name or code" /><small class="error-message"></small></label>
                 <label class="full-row">Description <b>*</b><textarea name="description" rows="4" required maxlength="500" placeholder="Briefly describe the resource and how it can help other students."></textarea><span class="field-hint"><small class="error-message"></small><span><b id="description-count">0</b> / 500</span></span></label>
               </div>
@@ -104,6 +105,17 @@
       <p>Your resource has been sent to the Polytechnic Helpdesk for review. Your PDF receipt has been downloaded.</p>
       <div class="dialog-actions"><button id="download-receipt" class="secondary" type="button">Download receipt</button><button id="close-dialog" type="button">Done</button></div>
     </dialog>
+
+    <div id="upload-overlay" class="upload-overlay" hidden role="status" aria-live="assertive" aria-label="Uploading resource">
+      <div class="upload-card">
+        <div class="upload-orbit" aria-hidden="true"><span>↑</span></div>
+        <p class="eyebrow">POLYTECHNIC HELPDESK</p>
+        <h2>Uploading your resource</h2>
+        <p id="upload-status">Preparing your document securely…</p>
+        <div class="upload-track" aria-hidden="true"><span></span></div>
+        <small>Please keep this page open until your contribution is received.</small>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
