@@ -323,7 +323,7 @@ statusForm.addEventListener('submit', (event) => {
     button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
     error.textContent = 'The status service could not be reached. Please try again.';
   };
-  request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&callback=${callbackName}`;
+  request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&prefix=${callbackName}`;
   document.head.appendChild(request);
 });
 

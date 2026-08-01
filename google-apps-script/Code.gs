@@ -10,7 +10,7 @@ const HEADERS = ['Receipt no.', 'Submitted at', 'Name', 'Email', 'Department', '
 
 function doGet(event) {
   const receiptNumber = event && event.parameter ? String(event.parameter.receipt || '').trim().toUpperCase() : '';
-  const callback = event && event.parameter ? String(event.parameter.callback || '') : '';
+  const callback = event && event.parameter ? String(event.parameter.prefix || '') : '';
   if (!receiptNumber) return ContentService.createTextOutput('Polytechnic Helpdesk upload service is running.');
 
   const sheet = getSheet_();
