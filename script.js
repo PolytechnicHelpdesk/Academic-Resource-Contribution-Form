@@ -1,4 +1,5 @@
 const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwO7q8KLic-EulBQkrgOt_df4gIwPJ_syE5ISFYtaWWKONLxzfc_Uo6ALCA69bBeJ7o/exec';
+const STATUS_API_URL = 'https://polytechnic-helpdesk-status.infoweb-user-as.workers.dev/status';
 const form = document.querySelector('#resource-form');
 const fileInput = document.querySelector('#resource-file');
 const fileName = document.querySelector('#file-name');
@@ -274,7 +275,7 @@ document.querySelector('#close-dialog').addEventListener('click', () => {
   form.querySelectorAll('.invalid').forEach((item) => item.classList.remove('invalid'));
 });
 
-statusForm.addEventListener('submit', (event) => {
+statusForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const receiptNumber = receiptLookup.value.trim().toUpperCase();
   const error = document.querySelector('#status-error');
@@ -286,51 +287,32 @@ statusForm.addEventListener('submit', (event) => {
     receiptLookup.focus();
     return;
   }
+  if (STATUS_API_URL.startsWith('PASTE_')) {
+    error.textContent = 'The status service is being set up. Please try again shortly.';
+    return;
+  }
 
   const button = statusForm.querySelector('button');
-  const callbackName = `polytechnicStatus${Date.now()}`;
-  const request = document.createElement('script');
-  let settled = false;
-  const finishWithResponse = (response) => {
-    if (settled) return;
-    settled = true;
-    window.clearTimeout(timeout);
-    finish();
-    button.disabled = false;
-    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
-    if (!response?.found) {
+  button.disabled = true;
+  button.textContent = 'Checking...';
+  try {
+    const service = new URL(STATUS_API_URL);
+    service.searchParams.set('receipt', receiptNumber);
+    const response = await fetch(service.toString());
+    if (!response.ok) throw new Error('Status request failed.');
+    const data = await response.json();
+    if (!data.ok) throw new Error(data.error || 'Status request failed.');
+    if (!data.found) {
       error.textContent = 'No submission was found for that receipt number.';
       return;
     }
-    renderSubmissionStatus(response);
-  };
-  const finish = () => {
-    request.remove();
-    delete window[callbackName];
-  };
-  const timeout = window.setTimeout(() => {
-    if (settled) return;
-    settled = true;
-    finish();
+    renderSubmissionStatus(data);
+  } catch (requestError) {
+    error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
+  } finally {
     button.disabled = false;
     button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
-    error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
-  }, 12000);
-
-  button.disabled = true;
-  button.textContent = 'Checking...';
-  window[callbackName] = finishWithResponse;
-  request.onerror = () => {
-    if (settled) return;
-    settled = true;
-    window.clearTimeout(timeout);
-    finish();
-    button.disabled = false;
-    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
-    error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
-  };
-  request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&prefix=${callbackName}&_=${Date.now()}`;
-  document.head.appendChild(request);
+  }
 });
 
 function renderSubmissionStatus(response) {
