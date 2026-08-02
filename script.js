@@ -373,6 +373,7 @@ function renderSubmissionStatus(response) {
     ['Resource Title:', response.resourceTitle]
   ].filter(([, value]) => value).forEach(([labelText, value]) => {
     const line = document.createElement('span');
+    line.style.display = 'block';
     const labelTextElement = document.createElement('strong');
     labelTextElement.textContent = `${labelText} `;
     line.append(labelTextElement, document.createTextNode(value));
