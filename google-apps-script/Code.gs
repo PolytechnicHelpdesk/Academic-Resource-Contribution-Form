@@ -7,7 +7,7 @@ const SHEET_NAME = 'Website Submissions';
 const UPLOAD_FOLDER_NAME = 'Polytechnic Helpdesk Uploads';
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
-const HEADERS = ['Receipt no.', 'Submitted at', 'Name', 'Email', 'Department', 'Semester', 'Resource title', 'Resource type', 'Subject', 'Description', 'Resource link', 'PDF filename', 'PDF in Drive', 'Submission status'];
+const HEADERS = ['Receipt no.', 'Submitted at', 'Name', 'Email', 'Department', 'Semester', 'Resource title', 'Resource type', 'Subject', 'Description', 'Resource link', 'PDF filename', 'PDF in Drive', 'Submission status', 'Remarks'];
 const PUBLIC_STATUS_SHEET_NAME = 'Public Status';
 
 function doGet(event) {
@@ -29,8 +29,9 @@ function findSubmission_(receiptNumber) {
   const statusIndex = headers.indexOf('Submission status');
   const titleIndex = headers.indexOf('Resource title');
   const match = values.find((row) => String(row[receiptIndex] || '').trim().toUpperCase() === receiptNumber);
+  const remarksIndex = headers.indexOf('Remarks');
   return match
-    ? { found: true, receiptNumber: String(match[receiptIndex]), status: String(match[statusIndex] || 'Under Review'), resourceTitle: String(match[titleIndex] || '') }
+    ? { found: true, receiptNumber: String(match[receiptIndex]), status: String(match[statusIndex] || 'Under Review'), resourceTitle: String(match[titleIndex] || ''), remarks: String(match[remarksIndex] || 'Under Review') }
     : { found: false };
 }
 
@@ -63,9 +64,9 @@ function doPost(event) {
     sheet.appendRow([
       data.receiptNumber, new Date(), data.name, data.email, data.department, data.semester,
       data.title, data.resourceType, data.subject, data.description,
-      data.resourceLink || '', data.file ? data.file.name : '', fileUrl, 'Under Review'
+      data.resourceLink || '', data.file ? data.file.name : '', fileUrl, 'Under Review', 'Under Review'
     ]);
-    upsertPublicStatus_(data.receiptNumber, 'Under Review', data.title, data.name);
+    upsertPublicStatus_(data.receiptNumber, 'Under Review', data.title, data.name, 'Under Review');
     return json_({ ok: true });
   } catch (error) {
     return json_({ ok: false, error: error.message });
@@ -115,6 +116,12 @@ function getSheet_() {
   if (!headers.includes('Submission status')) {
     sheet.getRange(1, sheet.getLastColumn() + 1).setValue('Submission status');
   }
+  const updatedHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  if (!updatedHeaders.includes('Remarks')) {
+    const remarksColumn = sheet.getLastColumn() + 1;
+    sheet.getRange(1, remarksColumn).setValue('Remarks');
+    if (sheet.getLastRow() > 1) sheet.getRange(2, remarksColumn, sheet.getLastRow() - 1, 1).setValue('Under Review');
+  }
   return sheet;
 }
 
@@ -139,27 +146,65 @@ function initializeStatusTracker() {
 
 /**
  * Installable on-edit trigger. It runs when the admin changes a submission
- * status in the Website Submissions sheet.
+ * status or remarks in either tracker sheet.
  */
 function onSubmissionStatusEdit(event) {
   if (!event || !event.range) return;
   const range = event.range;
   const sheet = range.getSheet();
-  if (sheet.getName() !== SHEET_NAME || range.getRow() < 2) return;
+  if (range.getRow() < 2) return;
+
+  if (sheet.getName() === PUBLIC_STATUS_SHEET_NAME) {
+    syncPublicStatusToSubmission_(sheet, range);
+    return;
+  }
+  if (sheet.getName() !== SHEET_NAME) return;
 
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const receiptColumn = headers.indexOf('Receipt no.') + 1;
   const statusColumn = headers.indexOf('Submission status') + 1;
   const titleColumn = headers.indexOf('Resource title') + 1;
   const nameColumn = headers.indexOf('Name') + 1;
-  if (!receiptColumn || !statusColumn || !titleColumn || !nameColumn) return;
+  const remarksColumn = headers.indexOf('Remarks') + 1;
+  if (!receiptColumn || !statusColumn || !titleColumn || !nameColumn || !remarksColumn) return;
 
   for (let row = range.getRow(); row < range.getRow() + range.getNumRows(); row += 1) {
     const receipt = String(sheet.getRange(row, receiptColumn).getValue() || '').trim();
     const status = String(sheet.getRange(row, statusColumn).getValue() || 'Under Review').trim();
     const title = String(sheet.getRange(row, titleColumn).getValue() || '').trim();
     const name = String(sheet.getRange(row, nameColumn).getValue() || '').trim();
-    if (receipt) upsertPublicStatus_(receipt, status || 'Under Review', title, name);
+    const remarks = String(sheet.getRange(row, remarksColumn).getValue() || 'Under Review').trim() || 'Under Review';
+    if (receipt) upsertPublicStatus_(receipt, status || 'Under Review', title, name, remarks);
+  }
+}
+
+function syncPublicStatusToSubmission_(publicSheet, editedRange) {
+  const publicHeaders = publicSheet.getRange(1, 1, 1, publicSheet.getLastColumn()).getValues()[0];
+  const publicReceiptColumn = publicHeaders.indexOf('Receipt no.') + 1;
+  const publicStatusColumn = publicHeaders.indexOf('Submission status') + 1;
+  const publicRemarksColumn = publicHeaders.indexOf('Remarks') + 1;
+  if (!publicReceiptColumn || !publicStatusColumn || !publicRemarksColumn) return;
+
+  const submissionSheet = getSheet_();
+  const submissionHeaders = submissionSheet.getRange(1, 1, 1, submissionSheet.getLastColumn()).getValues()[0];
+  const receiptColumn = submissionHeaders.indexOf('Receipt no.') + 1;
+  const statusColumn = submissionHeaders.indexOf('Submission status') + 1;
+  const remarksColumn = submissionHeaders.indexOf('Remarks') + 1;
+  if (!receiptColumn || !statusColumn || !remarksColumn) return;
+
+  const submissionReceipts = submissionSheet.getLastRow() > 1
+    ? submissionSheet.getRange(2, receiptColumn, submissionSheet.getLastRow() - 1, 1).getValues().flat()
+    : [];
+
+  for (let row = editedRange.getRow(); row < editedRange.getRow() + editedRange.getNumRows(); row += 1) {
+    const receipt = String(publicSheet.getRange(row, publicReceiptColumn).getValue() || '').trim().toUpperCase();
+    const status = String(publicSheet.getRange(row, publicStatusColumn).getValue() || 'Under Review').trim() || 'Under Review';
+    const remarks = String(publicSheet.getRange(row, publicRemarksColumn).getValue() || 'Under Review').trim() || 'Under Review';
+    const submissionIndex = submissionReceipts.findIndex((value) => String(value).trim().toUpperCase() === receipt);
+    if (submissionIndex !== -1) {
+      submissionSheet.getRange(submissionIndex + 2, statusColumn).setValue(status);
+      submissionSheet.getRange(submissionIndex + 2, remarksColumn).setValue(remarks);
+    }
   }
 }
 
@@ -167,7 +212,11 @@ function getPublicStatusSheet_() {
   const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = spreadsheet.getSheetByName(PUBLIC_STATUS_SHEET_NAME);
   if (!sheet) sheet = spreadsheet.insertSheet(PUBLIC_STATUS_SHEET_NAME);
-  if (sheet.getLastRow() === 0) sheet.appendRow(['Receipt no.', 'Resource title', 'Full name', 'Submission status']);
+  if (sheet.getLastRow() === 0) sheet.appendRow(['Receipt no.', 'Resource title', 'Full name', 'Submission status', 'Remarks']);
+  else {
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    if (!headers.includes('Remarks')) sheet.getRange(1, sheet.getLastColumn() + 1).setValue('Remarks');
+  }
   return sheet;
 }
 
@@ -179,36 +228,39 @@ function rebuildPublicStatusSheet_() {
   const statusIndex = headers.indexOf('Submission status');
   const titleIndex = headers.indexOf('Resource title');
   const nameIndex = headers.indexOf('Name');
+  const remarksIndex = headers.indexOf('Remarks');
   const rows = values
     .filter((row) => String(row[receiptIndex] || '').trim())
     .map((row) => [
       String(row[receiptIndex]).trim(),
       String(row[titleIndex] || '').trim(),
       String(row[nameIndex] || '').trim(),
-      String(row[statusIndex] || 'Under Review').trim() || 'Under Review'
+      String(row[statusIndex] || 'Under Review').trim() || 'Under Review',
+      String(row[remarksIndex] || 'Under Review').trim() || 'Under Review'
     ]);
 
   const publicSheet = getPublicStatusSheet_();
   publicSheet.clearContents();
-  publicSheet.getRange(1, 1, 1, 4).setValues([['Receipt no.', 'Resource title', 'Full name', 'Submission status']]);
-  if (rows.length) publicSheet.getRange(2, 1, rows.length, 4).setValues(rows);
+  publicSheet.getRange(1, 1, 1, 5).setValues([['Receipt no.', 'Resource title', 'Full name', 'Submission status', 'Remarks']]);
+  if (rows.length) publicSheet.getRange(2, 1, rows.length, 5).setValues(rows);
   publicSheet.setFrozenRows(1);
 }
 
-function upsertPublicStatus_(receipt, status, resourceTitle, fullName) {
+function upsertPublicStatus_(receipt, status, resourceTitle, fullName, remarks) {
   const publicSheet = getPublicStatusSheet_();
   const normalizedReceipt = String(receipt).trim().toUpperCase();
   const normalizedStatus = String(status || 'Under Review').trim() || 'Under Review';
   const normalizedTitle = String(resourceTitle || '').trim();
   const normalizedName = String(fullName || '').trim();
+  const normalizedRemarks = String(remarks || 'Under Review').trim() || 'Under Review';
   const receipts = publicSheet.getLastRow() > 1
     ? publicSheet.getRange(2, 1, publicSheet.getLastRow() - 1, 1).getValues().flat()
     : [];
   const index = receipts.findIndex((value) => String(value).trim().toUpperCase() === normalizedReceipt);
   if (index === -1) {
-    publicSheet.appendRow([normalizedReceipt, normalizedTitle, normalizedName, normalizedStatus]);
+    publicSheet.appendRow([normalizedReceipt, normalizedTitle, normalizedName, normalizedStatus, normalizedRemarks]);
   } else {
-    publicSheet.getRange(index + 2, 1, 1, 4).setValues([[normalizedReceipt, normalizedTitle, normalizedName, normalizedStatus]]);
+    publicSheet.getRange(index + 2, 1, 1, 5).setValues([[normalizedReceipt, normalizedTitle, normalizedName, normalizedStatus, normalizedRemarks]]);
   }
 }
 

@@ -28,6 +28,7 @@ export default {
       const statusColumn = headers.indexOf('submission status');
       const titleColumn = headers.indexOf('resource title');
       const nameColumn = headers.indexOf('full name');
+      const remarksColumn = headers.indexOf('remarks');
       if (receiptColumn === -1 || statusColumn === -1) throw new Error('The public status sheet has invalid headings.');
 
       const match = rows.slice(1).find((row) => String(row[receiptColumn] || '').trim().toUpperCase() === receipt);
@@ -37,7 +38,8 @@ export default {
         receiptNumber: match ? String(match[receiptColumn] || '').trim() : '',
         status: match ? String(match[statusColumn] || 'Under Review').trim() || 'Under Review' : 'Under Review',
         resourceTitle: match && titleColumn !== -1 ? String(match[titleColumn] || '').trim() : '',
-        contributor: match && nameColumn !== -1 ? String(match[nameColumn] || '').trim() : ''
+        contributor: match && nameColumn !== -1 ? String(match[nameColumn] || '').trim() : '',
+        remarks: match && remarksColumn !== -1 ? String(match[remarksColumn] || 'Under Review').trim() || 'Under Review' : 'Under Review'
       });
     } catch (error) {
       console.error('Status proxy error:', error.message);

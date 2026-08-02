@@ -371,7 +371,8 @@ function renderSubmissionStatus(response) {
   [
     ['Receipt No:', response.receiptNumber],
     ['Full Name:', response.contributor],
-    ['Resource Title:', response.resourceTitle]
+    ['Resource Title:', response.resourceTitle],
+    ['Remarks:', response.remarks || 'Under Review']
   ].filter(([, value]) => value).forEach(([labelText, value]) => {
     const line = document.createElement('span');
     line.className = 'status-detail-line';
