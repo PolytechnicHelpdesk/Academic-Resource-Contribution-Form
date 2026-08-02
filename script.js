@@ -337,6 +337,10 @@ function renderSubmissionStatus(response) {
   label.textContent = 'Current decision';
   title.textContent = status;
   message.textContent = description;
-  receipt.textContent = `${response.receiptNumber} · ${response.resourceTitle || 'Academic resource contribution'}`;
+  receipt.textContent = [
+    `Receipt No. ${response.receiptNumber}`,
+    response.resourceTitle ? `Resource Title: ${response.resourceTitle}` : '',
+    response.contributor ? `Full Name: ${response.contributor}` : ''
+  ].filter(Boolean).join(' • ');
   result.hidden = false;
 }

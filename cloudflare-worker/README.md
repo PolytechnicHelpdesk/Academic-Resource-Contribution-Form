@@ -22,10 +22,10 @@ It should show JSON containing `found` and `status`.
 If it returns `The status service is temporarily unavailable`, open the Worker in Cloudflare and select **Logs** after making one test request. The log records the exact Google Apps Script response needed for troubleshooting.
 # Reliable status lookup setup
 
-Google Apps Script is returning a Google sign-in page to Cloudflare instead of JSON. Use a published, status-only sheet instead.
+Google Apps Script is returning a Google sign-in page to Cloudflare instead of JSON. Use a published tracker sheet instead.
 
-1. In Apps Script, replace `Code.gs` with the workspace version, save it, select `initializeStatusTracker`, and click **Run** once. Approve the requested permissions. This creates a `Public Status` sheet containing only **Receipt no.** and **Submission status** and installs the automatic status-sync trigger.
+1. In Apps Script, replace `Code.gs` with the workspace version, save it, select `initializeStatusTracker`, and click **Run** once. Approve the requested permissions. This creates a `Public Status` sheet containing **Receipt no.**, **Resource title**, **Full name**, and **Submission status**, and installs the automatic status-sync trigger.
 2. In Google Sheets choose **File → Share → Publish to web**. Select the `Public Status` sheet, choose **Comma-separated values (.csv)**, and publish it. Copy the generated link, which ends with `output=csv`.
 3. In `worker.js`, paste that link into `PUBLIC_STATUS_CSV_URL`, then deploy the Worker.
 
-The main website keeps its existing design. The public sheet does not include student names, email addresses, uploads, or Drive links.
+The main website keeps its existing design. The public sheet does not include email addresses, uploads, or Drive links.

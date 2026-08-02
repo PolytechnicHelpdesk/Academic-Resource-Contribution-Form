@@ -61,7 +61,7 @@ function doPost(event) {
       data.title, data.resourceType, data.subject, data.description,
       data.resourceLink || '', data.file ? data.file.name : '', fileUrl, 'Under Review'
     ]);
-    upsertPublicStatus_(data.receiptNumber, 'Under Review');
+    upsertPublicStatus_(data.receiptNumber, 'Under Review', data.title, data.name);
     return json_({ ok: true });
   } catch (error) {
     return json_({ ok: false, error: error.message });
@@ -115,7 +115,7 @@ function getSheet_() {
 }
 
 /**
- * Run this once from the Apps Script editor. It creates a safe, status-only
+ * Run this once from the Apps Script editor. It creates the public tracker
  * sheet and a trigger that keeps it updated when an admin changes a status.
  */
 function initializeStatusTracker() {
@@ -146,17 +146,16 @@ function onSubmissionStatusEdit(event) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const receiptColumn = headers.indexOf('Receipt no.') + 1;
   const statusColumn = headers.indexOf('Submission status') + 1;
-  if (!receiptColumn || !statusColumn) return;
-
-  // Only react to edits affecting the receipt or status cells.
-  const firstEditedColumn = range.getColumn();
-  const lastEditedColumn = firstEditedColumn + range.getNumColumns() - 1;
-  if (lastEditedColumn < receiptColumn || firstEditedColumn > statusColumn) return;
+  const titleColumn = headers.indexOf('Resource title') + 1;
+  const nameColumn = headers.indexOf('Name') + 1;
+  if (!receiptColumn || !statusColumn || !titleColumn || !nameColumn) return;
 
   for (let row = range.getRow(); row < range.getRow() + range.getNumRows(); row += 1) {
     const receipt = String(sheet.getRange(row, receiptColumn).getValue() || '').trim();
     const status = String(sheet.getRange(row, statusColumn).getValue() || 'Under Review').trim();
-    if (receipt) upsertPublicStatus_(receipt, status || 'Under Review');
+    const title = String(sheet.getRange(row, titleColumn).getValue() || '').trim();
+    const name = String(sheet.getRange(row, nameColumn).getValue() || '').trim();
+    if (receipt) upsertPublicStatus_(receipt, status || 'Under Review', title, name);
   }
 }
 
@@ -164,7 +163,7 @@ function getPublicStatusSheet_() {
   const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = spreadsheet.getSheetByName(PUBLIC_STATUS_SHEET_NAME);
   if (!sheet) sheet = spreadsheet.insertSheet(PUBLIC_STATUS_SHEET_NAME);
-  if (sheet.getLastRow() === 0) sheet.appendRow(['Receipt no.', 'Submission status']);
+  if (sheet.getLastRow() === 0) sheet.appendRow(['Receipt no.', 'Resource title', 'Full name', 'Submission status']);
   return sheet;
 }
 
@@ -174,29 +173,38 @@ function rebuildPublicStatusSheet_() {
   const headers = values.shift() || [];
   const receiptIndex = headers.indexOf('Receipt no.');
   const statusIndex = headers.indexOf('Submission status');
+  const titleIndex = headers.indexOf('Resource title');
+  const nameIndex = headers.indexOf('Name');
   const rows = values
     .filter((row) => String(row[receiptIndex] || '').trim())
-    .map((row) => [String(row[receiptIndex]).trim(), String(row[statusIndex] || 'Under Review').trim() || 'Under Review']);
+    .map((row) => [
+      String(row[receiptIndex]).trim(),
+      String(row[titleIndex] || '').trim(),
+      String(row[nameIndex] || '').trim(),
+      String(row[statusIndex] || 'Under Review').trim() || 'Under Review'
+    ]);
 
   const publicSheet = getPublicStatusSheet_();
   publicSheet.clearContents();
-  publicSheet.getRange(1, 1, 1, 2).setValues([['Receipt no.', 'Submission status']]);
-  if (rows.length) publicSheet.getRange(2, 1, rows.length, 2).setValues(rows);
+  publicSheet.getRange(1, 1, 1, 4).setValues([['Receipt no.', 'Resource title', 'Full name', 'Submission status']]);
+  if (rows.length) publicSheet.getRange(2, 1, rows.length, 4).setValues(rows);
   publicSheet.setFrozenRows(1);
 }
 
-function upsertPublicStatus_(receipt, status) {
+function upsertPublicStatus_(receipt, status, resourceTitle, fullName) {
   const publicSheet = getPublicStatusSheet_();
   const normalizedReceipt = String(receipt).trim().toUpperCase();
   const normalizedStatus = String(status || 'Under Review').trim() || 'Under Review';
+  const normalizedTitle = String(resourceTitle || '').trim();
+  const normalizedName = String(fullName || '').trim();
   const receipts = publicSheet.getLastRow() > 1
     ? publicSheet.getRange(2, 1, publicSheet.getLastRow() - 1, 1).getValues().flat()
     : [];
   const index = receipts.findIndex((value) => String(value).trim().toUpperCase() === normalizedReceipt);
   if (index === -1) {
-    publicSheet.appendRow([normalizedReceipt, normalizedStatus]);
+    publicSheet.appendRow([normalizedReceipt, normalizedTitle, normalizedName, normalizedStatus]);
   } else {
-    publicSheet.getRange(index + 2, 2).setValue(normalizedStatus);
+    publicSheet.getRange(index + 2, 1, 1, 4).setValues([[normalizedReceipt, normalizedTitle, normalizedName, normalizedStatus]]);
   }
 }
 

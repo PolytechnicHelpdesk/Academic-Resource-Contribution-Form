@@ -2,7 +2,7 @@
 // Deploy this file as a Worker, then paste its /status URL into script.js.
 
 // Paste the CSV link from the published "Public Status" Google Sheet here.
-// It must end in output=csv. This sheet contains only receipt numbers/statuses.
+// It must end in output=csv. This sheet contains receipt numbers, titles, names, and statuses.
 const PUBLIC_STATUS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQvens0wZEWwu64QCiueQsQkhYl4AmPz6MVUYoHInQ0eWT6cdgqMMst85KBF2FE8dG5wO9qXjahW5H0/pub?gid=1946449221&single=true&output=csv';
 const WEBSITE_ORIGIN = 'https://polytechnichelpdesk.github.io';
 
@@ -30,13 +30,20 @@ export default {
 
       const raw = await upstream.text();
       const rows = parseCsv_(raw);
-      const match = rows.slice(1).find((row) => String(row[0] || '').trim().toUpperCase() === receipt);
+      const headers = rows[0].map((header) => String(header).replace(/^\uFEFF/, '').trim().toLowerCase());
+      const receiptColumn = headers.indexOf('receipt no.');
+      const statusColumn = headers.indexOf('submission status');
+      const titleColumn = headers.indexOf('resource title');
+      const nameColumn = headers.indexOf('full name');
+      if (receiptColumn === -1 || statusColumn === -1) throw new Error('The public status sheet has invalid headings.');
+      const match = rows.slice(1).find((row) => String(row[receiptColumn] || '').trim().toUpperCase() === receipt);
       return response({
         ok: true,
         found: Boolean(match),
-        receiptNumber: match ? String(match[0] || '').trim() : '',
-        status: match ? String(match[1] || 'Under Review').trim() || 'Under Review' : 'Under Review',
-        resourceTitle: ''
+        receiptNumber: match ? String(match[receiptColumn] || '').trim() : '',
+        status: match ? String(match[statusColumn] || 'Under Review').trim() || 'Under Review' : 'Under Review',
+        resourceTitle: match && titleColumn !== -1 ? String(match[titleColumn] || '').trim() : '',
+        contributor: match && nameColumn !== -1 ? String(match[nameColumn] || '').trim() : ''
       });
     } catch (error) {
       console.error('Status proxy error:', error.message);
