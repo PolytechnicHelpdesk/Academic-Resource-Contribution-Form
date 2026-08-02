@@ -52,7 +52,10 @@ function escapeHtml_(value) {
 
 function doPost(event) {
   try {
-    const data = JSON.parse(event.postData.contents);
+    const payload = event && event.parameter && event.parameter.payload
+      ? event.parameter.payload
+      : event && event.postData ? event.postData.contents : '';
+    const data = JSON.parse(payload);
     validate_(data);
     const fileUrl = saveFile_(data.file);
     const sheet = getSheet_();

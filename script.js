@@ -79,6 +79,32 @@ function readFile(file) {
   });
 }
 
+// A normal HTML form POST is used for Apps Script uploads because it is not
+// subject to the browser CORS rules that can block a cross-site fetch request.
+function postToAppsScript(data) {
+  const transport = document.createElement('form');
+  transport.method = 'POST';
+  transport.action = APPS_SCRIPT_WEB_APP_URL;
+  transport.target = 'helpdesk-upload-target';
+  transport.acceptCharset = 'UTF-8';
+  transport.hidden = true;
+
+  const payload = document.createElement('input');
+  payload.type = 'hidden';
+  payload.name = 'payload';
+  payload.value = JSON.stringify(data);
+  transport.appendChild(payload);
+  document.body.appendChild(transport);
+  transport.submit();
+
+  return new Promise((resolve) => {
+    window.setTimeout(() => {
+      transport.remove();
+      resolve();
+    }, 700);
+  });
+}
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!validate()) return;
@@ -104,7 +130,7 @@ form.addEventListener('submit', async (event) => {
 
     showUploadStatus(file ? 'Uploading your PDF to the Polytechnic Helpdesk...' : 'Sending your resource details to the Polytechnic Helpdesk...');
     submitButton.textContent = 'Uploading resource...';
-    await fetch(APPS_SCRIPT_WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+    await postToAppsScript(data);
 
     latestSubmission = { ...data, submittedAt: new Date().toISOString() };
     hideUploadStatus();
