@@ -83,7 +83,7 @@ form.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!validate()) return;
   if (APPS_SCRIPT_WEB_APP_URL.startsWith('PASTE_')) {
-    document.querySelector('#file-link-error').textContent = 'The upload service has not been connected yet. Follow GOOGLE_DRIVE_SETUP.md first.';
+    document.querySelector('#file-link-error').textContent = 'The upload service has not been connected yet.';
     return;
   }
 

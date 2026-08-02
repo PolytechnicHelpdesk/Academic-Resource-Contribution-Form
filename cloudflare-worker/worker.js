@@ -1,15 +1,12 @@
 // Polytechnic Helpdesk status proxy for Cloudflare Workers.
-// Deploy this file as a Worker, then paste its /status URL into script.js.
+// This reads the published, status-only Google Sheet and keeps the website UI native.
 
-// Paste the CSV link from the published "Public Status" Google Sheet here.
-// It must end in output=csv. This sheet contains receipt numbers, titles, names, and statuses.
 const PUBLIC_STATUS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQvens0wZEWwu64QCiueQsQkhYl4AmPz6MVUYoHInQ0eWT6cdgqMMst85KBF2FE8dG5wO9qXjahW5H0/pub?gid=1946449221&single=true&output=csv';
 const WEBSITE_ORIGIN = 'https://polytechnichelpdesk.github.io';
 
 export default {
   async fetch(request) {
     const requestUrl = new URL(request.url);
-
     if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders() });
     if (requestUrl.pathname !== '/status') return response({ ok: false, error: 'Not found.' }, 404);
     if (request.method !== 'GET') return response({ ok: false, error: 'Method not allowed.' }, 405);
@@ -18,9 +15,6 @@ export default {
     if (!receipt) return response({ ok: false, error: 'A receipt number is required.' }, 400);
 
     try {
-      if (PUBLIC_STATUS_CSV_URL.startsWith('PASTE_')) {
-        throw new Error('The public status CSV URL has not been configured.');
-      }
       const upstream = await fetch(PUBLIC_STATUS_CSV_URL, {
         headers: { Accept: 'text/csv, text/plain;q=0.9' },
         redirect: 'follow',
@@ -28,14 +22,14 @@ export default {
       });
       if (!upstream.ok) throw new Error(`Google service returned ${upstream.status}`);
 
-      const raw = await upstream.text();
-      const rows = parseCsv_(raw);
+      const rows = parseCsv_(await upstream.text());
       const headers = rows[0].map((header) => String(header).replace(/^\uFEFF/, '').trim().toLowerCase());
       const receiptColumn = headers.indexOf('receipt no.');
       const statusColumn = headers.indexOf('submission status');
       const titleColumn = headers.indexOf('resource title');
       const nameColumn = headers.indexOf('full name');
       if (receiptColumn === -1 || statusColumn === -1) throw new Error('The public status sheet has invalid headings.');
+
       const match = rows.slice(1).find((row) => String(row[receiptColumn] || '').trim().toUpperCase() === receipt);
       return response({
         ok: true,
@@ -52,16 +46,6 @@ export default {
   }
 };
 
-function corsHeaders() {
-  return {
-    'Access-Control-Allow-Origin': WEBSITE_ORIGIN,
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Vary': 'Origin'
-  };
-}
-
-// Supports normal CSV quoting, including commas inside quoted values.
 function parseCsv_(text) {
   const rows = [];
   let row = [];
@@ -73,9 +57,7 @@ function parseCsv_(text) {
       if (quoted && text[index + 1] === '"') {
         value += '"';
         index += 1;
-      } else {
-        quoted = !quoted;
-      }
+      } else quoted = !quoted;
     } else if (character === ',' && !quoted) {
       row.push(value);
       value = '';
@@ -85,13 +67,20 @@ function parseCsv_(text) {
       if (row.some((cell) => cell !== '')) rows.push(row);
       row = [];
       value = '';
-    } else {
-      value += character;
-    }
+    } else value += character;
   }
   row.push(value);
   if (row.some((cell) => cell !== '')) rows.push(row);
   return rows;
+}
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': WEBSITE_ORIGIN,
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Vary': 'Origin'
+  };
 }
 
 function response(value, status = 200) {
