@@ -1,4 +1,4 @@
-const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwO7q8KLic-EulBQkrgOt_df4gIwPJ_syE5ISFYtaWWKONLxzfc_Uo6ALCA69bBeJ7o/exec';
+const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwOU_g8vlQk8ctmrFwQwNjgY_52AoFo9wPXYPYM9N7kqhviGQL7y9nSDJgn8zsgu2e-dw/exec';
 const STATUS_API_URL = 'https://polytechnic-helpdesk-status.infoweb-user-as.workers.dev/status';
 const form = document.querySelector('#resource-form');
 const fileInput = document.querySelector('#resource-file');
