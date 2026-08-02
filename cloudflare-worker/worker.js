@@ -2,7 +2,7 @@
 // Deploy this file as a Worker, then paste its /status URL into script.js.
 
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwO7q8KLic-EulBQkrgOt_df4gIwPJ_syE5ISFYtaWWKONLxzfc_Uo6ALCA69bBeJ7o/exec';
-const WEBSITE_ORIGIN = 'https://iichelpdesk.github.io';
+const WEBSITE_ORIGIN = 'https://polytechnichelpdesk.github.io';
 
 export default {
   async fetch(request) {
@@ -26,7 +26,14 @@ export default {
       });
       if (!upstream.ok) throw new Error(`Google service returned ${upstream.status}`);
 
-      const data = await upstream.json();
+      const raw = await upstream.text();
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (parseError) {
+        console.error('Apps Script returned non-JSON:', upstream.status, raw.slice(0, 500));
+        throw new Error('Apps Script returned a non-JSON response.');
+      }
       return response({
         ok: true,
         found: Boolean(data.found),
@@ -35,6 +42,7 @@ export default {
         resourceTitle: data.resourceTitle || ''
       });
     } catch (error) {
+      console.error('Status proxy error:', error.message);
       return response({ ok: false, error: 'The status service is temporarily unavailable.' }, 502);
     }
   }
