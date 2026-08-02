@@ -334,7 +334,7 @@ function renderSubmissionStatus(response) {
   else if (normalized === 'partially rejected') { type = 'rejected'; symbol = '◐'; description = 'Part of your submission was not accepted. The helpdesk may contact you with details.'; }
   result.className = `status-result ${type}`;
   icon.textContent = symbol;
-  label.textContent = 'Current decision';
+  label.textContent = 'Current Status';
   title.textContent = status;
   message.textContent = description;
   receipt.textContent = [
