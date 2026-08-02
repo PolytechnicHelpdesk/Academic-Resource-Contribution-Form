@@ -107,6 +107,7 @@
             <label for="receipt-lookup">Receipt number</label>
             <div class="lookup-row"><input id="receipt-lookup" type="text" autocomplete="off" placeholder="e.g. PH-260802-0326-A9X7" required /><button type="submit">Check status <span aria-hidden="true">→</span></button></div>
             <small id="status-error" class="status-error" aria-live="polite"></small>
+            <div id="status-loading" class="status-loading" hidden role="status" aria-live="polite"><span aria-hidden="true"></span>Checking latest status…</div>
           </form>
           <div id="status-result" class="status-result" hidden aria-live="polite">
             <span id="status-icon" class="status-result-icon" aria-hidden="true"></span>
@@ -142,6 +143,6 @@
 
     <iframe name="helpdesk-upload-target" id="helpdesk-upload-target" hidden title="Submission transport"></iframe>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="script.js?v=20260802-24"></script>
+  <script src="script.js?v=20260802-25"></script>
   </body>
 </html>

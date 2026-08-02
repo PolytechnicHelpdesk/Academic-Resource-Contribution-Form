@@ -306,6 +306,7 @@ statusForm.addEventListener('submit', async (event) => {
   const receiptNumber = receiptLookup.value.trim().toUpperCase();
   const error = document.querySelector('#status-error');
   const result = document.querySelector('#status-result');
+  const loading = document.querySelector('#status-loading');
   error.textContent = '';
   result.hidden = true;
   if (!receiptNumber) {
@@ -321,6 +322,7 @@ statusForm.addEventListener('submit', async (event) => {
   const button = statusForm.querySelector('button');
   button.disabled = true;
   button.textContent = 'Checking...';
+  loading.hidden = false;
   try {
     const service = new URL(STATUS_API_URL);
     service.searchParams.set('receipt', receiptNumber);
@@ -336,6 +338,7 @@ statusForm.addEventListener('submit', async (event) => {
   } catch (requestError) {
     error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
   } finally {
+    loading.hidden = true;
     button.disabled = false;
     button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
   }
@@ -363,10 +366,17 @@ function renderSubmissionStatus(response) {
   label.textContent = 'Current Status';
   title.textContent = status;
   message.textContent = description;
-  receipt.textContent = [
-    `Receipt No: ${response.receiptNumber}`,
-    response.contributor ? `Full Name: ${response.contributor}` : '',
-    response.resourceTitle ? `Resource Title: ${response.resourceTitle}` : ''
-  ].filter(Boolean).join('\n');
+  receipt.replaceChildren();
+  [
+    ['Receipt No:', response.receiptNumber],
+    ['Full Name:', response.contributor],
+    ['Resource Title:', response.resourceTitle]
+  ].filter(([, value]) => value).forEach(([labelText, value]) => {
+    const line = document.createElement('span');
+    const labelTextElement = document.createElement('strong');
+    labelTextElement.textContent = `${labelText} `;
+    line.append(labelTextElement, document.createTextNode(value));
+    receipt.append(line);
+  });
   result.hidden = false;
 }
