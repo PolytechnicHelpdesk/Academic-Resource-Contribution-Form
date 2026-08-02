@@ -15,6 +15,7 @@ function doGet(event) {
   if (!receiptNumber) return ContentService.createTextOutput('Polytechnic Helpdesk upload service is running.');
 
   const response = findSubmission_(receiptNumber);
+  if (transport === 'page') return statusPage_(response);
   if (transport === 'frame') return statusFrame_(response);
   return jsonp_(callback, response);
 }
@@ -41,6 +42,20 @@ function statusFrame_(response) {
   const html = `<!doctype html><html><body><script>window.parent.postMessage(${safeResponse}, '*');</script></body></html>`;
   return HtmlService.createHtmlOutput(html)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function statusPage_(response) {
+  const found = response.found;
+  const status = found ? escapeHtml_(response.status || 'Under Review') : 'Submission not found';
+  const title = found ? escapeHtml_(response.resourceTitle || 'Academic resource contribution') : 'Check the receipt number and try again.';
+  const receipt = found ? escapeHtml_(response.receiptNumber) : '';
+  const color = /^accepted$/i.test(status) ? '#16723d' : /rejected/i.test(status) ? '#a43232' : /partially accepted/i.test(status) ? '#1b628f' : '#8a6113';
+  const html = `<!doctype html><html><head><base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Submission status</title><style>body{margin:0;background:#eaf4f8;font-family:Arial,sans-serif;color:#18304a}.card{box-sizing:border-box;width:min(620px,calc(100% - 32px));margin:48px auto;padding:34px;border-radius:18px;background:#fff;box-shadow:0 18px 48px #1d526b1c}.eyebrow{margin:0 0 8px;color:#2874b9;font-size:12px;font-weight:700;letter-spacing:.12em}.status{display:inline-block;margin:20px 0 10px;padding:8px 12px;border-radius:999px;background:#f5f7f9;color:${color};font-weight:700}.title{margin:0;font-size:24px}.detail{margin:12px 0 0;color:#5d7183;line-height:1.5}.receipt{margin-top:22px;padding-top:18px;border-top:1px solid #dce5ec;color:#5d7183;font-size:14px}.back{display:inline-block;margin-top:26px;color:#176aac;font-weight:700;text-decoration:none}</style></head><body><main class="card"><p class="eyebrow">POLYTECHNIC HELPDESK</p><h1 class="title">${found ? 'Resource submission status' : 'No submission found'}</h1><p class="status">${status}</p><p class="detail">${title}</p>${receipt ? `<p class="receipt">Receipt No. ${receipt}</p>` : ''}<a class="back" href="https://iichelpdesk.github.io/">Return to Polytechnic Helpdesk</a></main></body></html>`;
+  return HtmlService.createHtmlOutput(html).setTitle('Polytechnic Helpdesk - Submission Status');
+}
+
+function escapeHtml_(value) {
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function doPost(event) {

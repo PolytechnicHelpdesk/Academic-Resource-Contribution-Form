@@ -40,6 +40,15 @@ function hideUploadStatus() {
   document.querySelector('#upload-overlay').hidden = true;
 }
 
+function showStatusFallback(error, receiptNumber) {
+  const link = document.createElement('a');
+  link.href = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&transport=page`;
+  link.target = '_blank';
+  link.rel = 'noopener';
+  link.textContent = 'Open status page';
+  error.replaceChildren('Status could not be displayed here. ', link);
+}
+
 function setError(field, message = '') {
   field.classList.toggle('invalid', Boolean(message));
   const error = field.closest('label')?.querySelector('.error-message');
@@ -325,7 +334,7 @@ statusForm.addEventListener('submit', (event) => {
     finish();
     button.disabled = false;
     button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
-    error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
+    showStatusFallback(error, receiptNumber);
   }, 12000);
 
   button.disabled = true;
