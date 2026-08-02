@@ -28,4 +28,10 @@ footer { display:flex; justify-content:space-between; width:min(1320px,calc(100%
 .status-loading { display:flex; align-items:center; gap:8px; margin-top:12px; color:#527084; font-size:11px; font-weight:700; }
 .status-loading[hidden] { display:none; }
 .status-loading span { width:15px; height:15px; border:2px solid #c7dce7; border-top-color:#2274b9; border-radius:50%; animation:status-spin .75s linear infinite; }
+.status-result > div { min-width:0; flex:1; }
+.status-result #status-receipt { display:grid; gap:5px; margin-top:10px; white-space:normal; }
+.status-detail-line { display:flex; align-items:baseline; gap:5px; min-width:0; }
+.status-detail-line strong { flex:0 0 auto; color:#536b80; font-weight:800; }
+.status-detail-value { min-width:0; overflow-wrap:anywhere; word-break:break-word; }
+@media (max-width:640px) { .status-result { align-items:flex-start; gap:12px; padding:16px; } .status-result-icon { flex:0 0 34px; width:34px; height:34px; margin-top:2px; } .status-detail-line { gap:4px; } }
 @keyframes status-spin { to { transform:rotate(360deg); } }
