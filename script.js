@@ -364,9 +364,9 @@ function renderSubmissionStatus(response) {
   title.textContent = status;
   message.textContent = description;
   receipt.textContent = [
-    `Receipt No. ${response.receiptNumber}`,
-    response.resourceTitle ? `Resource Title: ${response.resourceTitle}` : '',
-    response.contributor ? `Full Name: ${response.contributor}` : ''
-  ].filter(Boolean).join(' • ');
+    `Receipt No: ${response.receiptNumber}`,
+    response.contributor ? `Full Name: ${response.contributor}` : '',
+    response.resourceTitle ? `Resource Title: ${response.resourceTitle}` : ''
+  ].filter(Boolean).join('\n');
   result.hidden = false;
 }
