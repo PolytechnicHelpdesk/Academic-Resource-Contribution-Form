@@ -11,8 +11,15 @@ const HEADERS = ['Receipt no.', 'Submitted at', 'Name', 'Email', 'Department', '
 function doGet(event) {
   const receiptNumber = event && event.parameter ? String(event.parameter.receipt || '').trim().toUpperCase() : '';
   const callback = event && event.parameter ? String(event.parameter.prefix || '') : '';
+  const transport = event && event.parameter ? String(event.parameter.transport || '') : '';
   if (!receiptNumber) return ContentService.createTextOutput('Polytechnic Helpdesk upload service is running.');
 
+  const response = findSubmission_(receiptNumber);
+  if (transport === 'frame') return statusFrame_(response);
+  return jsonp_(callback, response);
+}
+
+function findSubmission_(receiptNumber) {
   const sheet = getSheet_();
   const values = sheet.getDataRange().getValues();
   const headers = values.shift() || [];
@@ -20,10 +27,20 @@ function doGet(event) {
   const statusIndex = headers.indexOf('Submission status');
   const titleIndex = headers.indexOf('Resource title');
   const match = values.find((row) => String(row[receiptIndex] || '').trim().toUpperCase() === receiptNumber);
-  const response = match
+  return match
     ? { found: true, receiptNumber: String(match[receiptIndex]), status: String(match[statusIndex] || 'Under Review'), resourceTitle: String(match[titleIndex] || '') }
     : { found: false };
-  return jsonp_(callback, response);
+}
+
+function statusFrame_(response) {
+  // Only the matching invisible iframe can read this message in the website.
+  const safeResponse = JSON.stringify({ type: 'polytechnic-helpdesk-status', response: response })
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+  const html = `<!doctype html><html><body><script>window.parent.postMessage(${safeResponse}, '*');</script></body></html>`;
+  return HtmlService.createHtmlOutput(html)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function doPost(event) {

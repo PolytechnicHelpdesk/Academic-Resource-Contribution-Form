@@ -290,9 +290,33 @@ statusForm.addEventListener('submit', (event) => {
   const button = statusForm.querySelector('button');
   const callbackName = `polytechnicStatus${Date.now()}`;
   const request = document.createElement('script');
+  const statusFrame = document.createElement('iframe');
+  statusFrame.hidden = true;
+  statusFrame.title = '';
+  statusFrame.setAttribute('aria-hidden', 'true');
   let settled = false;
+  const finishWithResponse = (response) => {
+    if (settled) return;
+    settled = true;
+    window.clearTimeout(timeout);
+    finish();
+    button.disabled = false;
+    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
+    if (!response?.found) {
+      error.textContent = 'No submission was found for that receipt number.';
+      return;
+    }
+    renderSubmissionStatus(response);
+  };
+  const receiveFrameStatus = (messageEvent) => {
+    if (messageEvent.source !== statusFrame.contentWindow) return;
+    const message = messageEvent.data;
+    if (message?.type === 'polytechnic-helpdesk-status') finishWithResponse(message.response);
+  };
   const finish = () => {
     request.remove();
+    statusFrame.remove();
+    window.removeEventListener('message', receiveFrameStatus);
     delete window[callbackName];
   };
   const timeout = window.setTimeout(() => {
@@ -306,30 +330,16 @@ statusForm.addEventListener('submit', (event) => {
 
   button.disabled = true;
   button.textContent = 'Checking...';
-  window[callbackName] = (response) => {
-    if (settled) return;
-    settled = true;
-    window.clearTimeout(timeout);
-    finish();
-    button.disabled = false;
-    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
-    if (!response?.found) {
-      error.textContent = 'No submission was found for that receipt number.';
-      return;
-    }
-    renderSubmissionStatus(response);
-  };
+  window[callbackName] = finishWithResponse;
   request.onerror = () => {
-    if (settled) return;
-    settled = true;
-    window.clearTimeout(timeout);
-    finish();
-    button.disabled = false;
-    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
-    error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
+    // The invisible frame is the fallback for browsers that block JSONP requests.
+    request.remove();
   };
   request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&prefix=${callbackName}&_=${Date.now()}`;
+  statusFrame.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&transport=frame&_=${Date.now()}`;
+  window.addEventListener('message', receiveFrameStatus);
   document.head.appendChild(request);
+  document.body.appendChild(statusFrame);
 });
 
 function renderSubmissionStatus(response) {
