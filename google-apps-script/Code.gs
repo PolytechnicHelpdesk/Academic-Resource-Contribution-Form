@@ -12,12 +12,10 @@ function doGet(event) {
   const receiptNumber = event && event.parameter ? String(event.parameter.receipt || '').trim().toUpperCase() : '';
   const callback = event && event.parameter ? String(event.parameter.prefix || '') : '';
   const transport = event && event.parameter ? String(event.parameter.transport || '') : '';
-  const requestId = event && event.parameter ? String(event.parameter.requestId || '') : '';
-  const targetOrigin = event && event.parameter ? String(event.parameter.origin || '') : '';
   if (!receiptNumber) return ContentService.createTextOutput('Polytechnic Helpdesk upload service is running.');
 
   const response = findSubmission_(receiptNumber);
-  if (transport === 'frame') return statusFrame_(response, requestId, targetOrigin);
+  if (transport === 'embed') return statusEmbed_(response);
   return jsonp_(callback, response);
 }
 
@@ -34,15 +32,21 @@ function findSubmission_(receiptNumber) {
     : { found: false };
 }
 
-function statusFrame_(response, requestId, targetOrigin) {
-  const safeResponse = JSON.stringify({ type: 'polytechnic-helpdesk-status', requestId: requestId, response: response })
-    .replace(/</g, '\\u003c')
-    .replace(/>/g, '\\u003e')
-    .replace(/&/g, '\\u0026');
-  const safeOrigin = /^https:\/\/[a-z0-9.-]+(?::\d+)?$/i.test(targetOrigin) ? targetOrigin : '*';
-  const html = `<!doctype html><html><body><script>window.top.postMessage(${safeResponse}, ${JSON.stringify(safeOrigin)});</script></body></html>`;
+function statusEmbed_(response) {
+  const found = response.found;
+  const rawStatus = found ? String(response.status || 'Under Review') : 'Submission Not Found';
+  const status = escapeHtml_(rawStatus.replace(/\b\w/g, function(letter) { return letter.toUpperCase(); }));
+  const title = found ? escapeHtml_(response.resourceTitle || 'Academic resource contribution') : 'Check the receipt number and try again.';
+  const receipt = found ? escapeHtml_(response.receiptNumber) : '';
+  const normalized = rawStatus.toLowerCase();
+  const color = normalized === 'accepted' ? '#16723d' : normalized.indexOf('rejected') !== -1 ? '#a43232' : normalized.indexOf('partially accepted') !== -1 ? '#1b628f' : '#8a6113';
+  const html = `<!doctype html><html><head><base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1"><style>html,body{margin:0;background:transparent;font-family:Arial,sans-serif;color:#18304a}.result{box-sizing:border-box;min-height:148px;padding:18px;border:1px solid #dce5ec;border-radius:10px;background:#f8fbfd}.label{margin:0;color:#6c7e8c;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}.status{display:inline-block;margin:9px 0 6px;padding:6px 9px;border-radius:999px;background:#fff;color:${color};font-size:15px;font-weight:700}.detail{margin:0;color:#5d7183;font-size:13px;line-height:1.45}.receipt{margin:12px 0 0;color:#7e8d99;font-size:12px}</style></head><body><main class="result"><p class="label">Current decision</p><p class="status">${status}</p><p class="detail">${title}</p>${receipt ? `<p class="receipt">Receipt No. ${receipt}</p>` : ''}</main></body></html>`;
   return HtmlService.createHtmlOutput(html)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function escapeHtml_(value) {
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function doPost(event) {

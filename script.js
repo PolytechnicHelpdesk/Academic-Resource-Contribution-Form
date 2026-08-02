@@ -10,6 +10,13 @@ const receiptLookup = document.querySelector('#receipt-lookup');
 const maxFileSize = 5 * 1024 * 1024;
 let latestSubmission;
 
+function serviceUrl(parameters = {}) {
+  const url = new URL(APPS_SCRIPT_WEB_APP_URL);
+  url.searchParams.set('authuser', '0');
+  Object.entries(parameters).forEach(([key, value]) => url.searchParams.set(key, value));
+  return url.toString();
+}
+
 document.querySelector('#year').textContent = new Date().getFullYear();
 
 description.addEventListener('input', () => {
@@ -103,7 +110,7 @@ form.addEventListener('submit', async (event) => {
 
     showUploadStatus(file ? 'Uploading your PDF to the Polytechnic Helpdesk...' : 'Sending your resource details to the Polytechnic Helpdesk...');
     submitButton.textContent = 'Uploading resource...';
-    await fetch(APPS_SCRIPT_WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+    await fetch(serviceUrl(), { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
 
     latestSubmission = { ...data, submittedAt: new Date().toISOString() };
     hideUploadStatus();
@@ -291,11 +298,11 @@ statusForm.addEventListener('submit', (event) => {
   const callbackName = `polytechnicStatus${Date.now()}`;
   const request = document.createElement('script');
   const statusFrame = document.createElement('iframe');
-  const frameRequestId = `ph-status-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   statusFrame.hidden = true;
   statusFrame.title = '';
   statusFrame.setAttribute('aria-hidden', 'true');
   let settled = false;
+  let showingEmbeddedStatus = false;
   const finishWithResponse = (response) => {
     if (settled) return;
     settled = true;
@@ -309,14 +316,18 @@ statusForm.addEventListener('submit', (event) => {
     }
     renderSubmissionStatus(response);
   };
-  const receiveFrameStatus = (messageEvent) => {
-    const message = messageEvent.data;
-    if (message?.type === 'polytechnic-helpdesk-status' && message.requestId === frameRequestId) finishWithResponse(message.response);
+  const showEmbeddedStatus = () => {
+    if (settled) return;
+    showingEmbeddedStatus = true;
+    statusFrame.hidden = false;
+    statusFrame.className = 'status-embed';
+    statusFrame.src = serviceUrl({ receipt: receiptNumber, transport: 'embed', _: Date.now() });
   };
+  const embedTimer = window.setTimeout(showEmbeddedStatus, 1200);
   const finish = () => {
+    window.clearTimeout(embedTimer);
     request.remove();
     statusFrame.remove();
-    window.removeEventListener('message', receiveFrameStatus);
     delete window[callbackName];
   };
   const timeout = window.setTimeout(() => {
@@ -328,6 +339,16 @@ statusForm.addEventListener('submit', (event) => {
     error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
   }, 12000);
 
+  statusFrame.onload = () => {
+    if (!showingEmbeddedStatus || settled) return;
+    settled = true;
+    window.clearTimeout(timeout);
+    request.remove();
+    delete window[callbackName];
+    button.disabled = false;
+    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
+  };
+
   button.disabled = true;
   button.textContent = 'Checking...';
   window[callbackName] = finishWithResponse;
@@ -335,11 +356,9 @@ statusForm.addEventListener('submit', (event) => {
     // The invisible frame is the fallback for browsers that block JSONP requests.
     request.remove();
   };
-  request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&prefix=${callbackName}&_=${Date.now()}`;
-  statusFrame.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&transport=frame&requestId=${encodeURIComponent(frameRequestId)}&origin=${encodeURIComponent(window.location.origin)}&_=${Date.now()}`;
-  window.addEventListener('message', receiveFrameStatus);
+  request.src = serviceUrl({ receipt: receiptNumber, prefix: callbackName, _: Date.now() });
   document.head.appendChild(request);
-  document.body.appendChild(statusFrame);
+  statusForm.parentElement.appendChild(statusFrame);
 });
 
 function renderSubmissionStatus(response) {
