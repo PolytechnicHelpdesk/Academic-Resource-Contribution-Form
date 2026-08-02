@@ -10,13 +10,6 @@ const receiptLookup = document.querySelector('#receipt-lookup');
 const maxFileSize = 5 * 1024 * 1024;
 let latestSubmission;
 
-function serviceUrl(parameters = {}) {
-  const url = new URL(APPS_SCRIPT_WEB_APP_URL);
-  url.searchParams.set('authuser', '0');
-  Object.entries(parameters).forEach(([key, value]) => url.searchParams.set(key, value));
-  return url.toString();
-}
-
 document.querySelector('#year').textContent = new Date().getFullYear();
 
 description.addEventListener('input', () => {
@@ -110,7 +103,7 @@ form.addEventListener('submit', async (event) => {
 
     showUploadStatus(file ? 'Uploading your PDF to the Polytechnic Helpdesk...' : 'Sending your resource details to the Polytechnic Helpdesk...');
     submitButton.textContent = 'Uploading resource...';
-    await fetch(serviceUrl(), { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+    await fetch(APPS_SCRIPT_WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
 
     latestSubmission = { ...data, submittedAt: new Date().toISOString() };
     hideUploadStatus();
@@ -328,10 +321,15 @@ statusForm.addEventListener('submit', (event) => {
   button.textContent = 'Checking...';
   window[callbackName] = finishWithResponse;
   request.onerror = () => {
-    // The invisible frame is the fallback for browsers that block JSONP requests.
-    request.remove();
+    if (settled) return;
+    settled = true;
+    window.clearTimeout(timeout);
+    finish();
+    button.disabled = false;
+    button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
+    error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
   };
-  request.src = serviceUrl({ receipt: receiptNumber, prefix: callbackName, _: Date.now() });
+  request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&prefix=${callbackName}&_=${Date.now()}`;
   document.head.appendChild(request);
 });
 
