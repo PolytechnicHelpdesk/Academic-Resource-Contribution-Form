@@ -5,7 +5,8 @@
 const SPREADSHEET_ID = '1mPPYrSRvRncwxKeoUb3FwF8N71LD2wPLVH9cU9ulVdw';
 const SHEET_NAME = 'Website Submissions';
 const UPLOAD_FOLDER_NAME = 'Polytechnic Helpdesk Uploads';
-const MAX_PDF_BYTES = 5 * 1024 * 1024;
+const MAX_FILE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 const HEADERS = ['Receipt no.', 'Submitted at', 'Name', 'Email', 'Department', 'Semester', 'Resource title', 'Resource type', 'Subject', 'Description', 'Resource link', 'PDF filename', 'PDF in Drive', 'Submission status'];
 const PUBLIC_STATUS_SHEET_NAME = 'Public Status';
 
@@ -77,9 +78,9 @@ function validate_(data) {
   });
   if (!data.receiptNumber || !String(data.receiptNumber).trim()) throw new Error('Missing receipt number.');
   if (!data.file && !data.resourceLink) throw new Error('A file or resource link is required.');
-  if (data.file && data.file.mimeType !== 'application/pdf') throw new Error('Only PDF files are allowed.');
-  if (data.file && !data.file.base64) throw new Error('The PDF data is missing.');
-  if (data.file && Math.floor(String(data.file.base64).length * 0.75) > MAX_PDF_BYTES) throw new Error('The PDF is too large.');
+  if (data.file && !ALLOWED_FILE_TYPES.includes(data.file.mimeType)) throw new Error('Only PDF, JPG, JPEG, and PNG files are allowed.');
+  if (data.file && !data.file.base64) throw new Error('The file data is missing.');
+  if (data.file && Math.floor(String(data.file.base64).length * 0.75) > MAX_FILE_BYTES) throw new Error('The file is too large.');
 }
 
 function saveFile_(fileData) {

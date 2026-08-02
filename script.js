@@ -19,7 +19,7 @@ description.addEventListener('input', () => {
 
 fileInput.addEventListener('change', () => {
   const file = fileInput.files[0];
-  fileName.textContent = file ? `${file.name} - ${(file.size / 1024 / 1024).toFixed(2)} MB` : 'PDF only - Maximum file size 5 MB';
+  fileName.textContent = file ? `${file.name} - ${(file.size / 1024 / 1024).toFixed(2)} MB` : 'PDF, JPG, JPEG or PNG - Maximum file size 5 MB';
 });
 
 department.addEventListener('change', () => {
@@ -60,9 +60,10 @@ function validate() {
   const link = form.elements.resourceLink.value.trim();
   const groupError = document.querySelector('#file-link-error');
   groupError.textContent = '';
-  if (!file && !link) { groupError.textContent = 'Upload a PDF or provide a resource link.'; valid = false; }
-  if (file && file.type !== 'application/pdf') { groupError.textContent = 'Please select a PDF file.'; valid = false; }
-  if (file && file.size > maxFileSize) { groupError.textContent = 'The PDF must be 5 MB or smaller.'; valid = false; }
+  const allowedFileTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+  if (!file && !link) { groupError.textContent = 'Upload a file or provide a resource link.'; valid = false; }
+  if (file && !allowedFileTypes.includes(file.type)) { groupError.textContent = 'Please select a PDF, JPG, JPEG, or PNG file.'; valid = false; }
+  if (file && file.size > maxFileSize) { groupError.textContent = 'The file must be 5 MB or smaller.'; valid = false; }
   if (link && !form.elements.resourceLink.validity.valid) { setError(form.elements.resourceLink, 'Enter a valid URL.'); valid = false; }
 
   const consentError = document.querySelector('.consent-error');
@@ -128,7 +129,7 @@ form.addEventListener('submit', async (event) => {
     data.receiptNumber = createReceiptNumber();
     data.file = file ? { name: file.name, mimeType: file.type, base64: await readFile(file) } : null;
 
-    showUploadStatus(file ? 'Uploading your PDF to the Polytechnic Helpdesk...' : 'Sending your resource details to the Polytechnic Helpdesk...');
+    showUploadStatus(file ? 'Uploading your file to the Polytechnic Helpdesk...' : 'Sending your resource details to the Polytechnic Helpdesk...');
     submitButton.textContent = 'Uploading resource...';
     await postToAppsScript(data);
 
@@ -247,7 +248,7 @@ function downloadReceipt(data) {
   drawCell(margin, y, half, 'Resource type', data.resourceType);
   drawCell(margin + half + gap, y, half, 'Subject / course', data.subject);
   y += 22;
-  drawCell(margin, y, half, 'Attached PDF', data.file?.name || 'No PDF attached');
+  drawCell(margin, y, half, 'Attached file', data.file?.name || 'No file attached');
   drawCell(margin + half + gap, y, half, 'Resource link', data.resourceLink || 'Not provided');
   y += 28;
   drawSection('Contributor note', y);
@@ -296,7 +297,7 @@ document.querySelector('#close-dialog').addEventListener('click', () => {
   document.querySelector('#other-department-field').hidden = true;
   otherDepartment.required = false;
   document.querySelector('#description-count').textContent = '0';
-  fileName.textContent = 'PDF only - Maximum file size 5 MB';
+  fileName.textContent = 'PDF, JPG, JPEG or PNG - Maximum file size 5 MB';
   form.querySelectorAll('.error-message').forEach((item) => item.textContent = '');
   form.querySelectorAll('.invalid').forEach((item) => item.classList.remove('invalid'));
 });

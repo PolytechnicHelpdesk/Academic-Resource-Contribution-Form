@@ -41,7 +41,7 @@
           <h2>A simple way to give back.</h2>
           <ol>
             <li><span>01</span><div><strong>Complete the details</strong><p>Tell us who you are and what you are sharing.</p></div></li>
-            <li><span>02</span><div><strong>Attach your resource</strong><p>Upload a PDF or add a secure resource link.</p></div></li>
+            <li><span>02</span><div><strong>Attach your resource</strong><p>Upload a PDF or image, or add a secure resource link.</p></div></li>
             <li><span>03</span><div><strong>Our team reviews it</strong><p>Approved resources help students across the Polytechnic.</p></div></li>
           </ol>
           <div class="guide-note"><span aria-hidden="true">✓</span><p>Only submit material that you are permitted to share.</p></div>
@@ -82,8 +82,8 @@
             <fieldset>
               <legend><span>3</span> Add Your Resource</legend>
               <div class="form-grid two-columns attachment-grid">
-                <label>PDF Document <b>*</b><span class="file-picker"><input id="resource-file" name="file" type="file" accept="application/pdf,.pdf" /><span class="upload-icon" aria-hidden="true">↑</span><span>Choose PDF file</span></span><small id="file-name">PDF only · Maximum file size 5 MB</small></label>
-                <label>Or Resource Link<input name="resourceLink" type="url" placeholder="https://drive.google.com/..." /><small>Use a public Drive, OneDrive, or web link instead of a PDF.</small></label>
+                <label>Resource File <b>*</b><span class="file-picker"><input id="resource-file" name="file" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" /><span class="upload-icon" aria-hidden="true">↑</span><span>Choose a file</span></span><small id="file-name">PDF, JPG, JPEG or PNG · Maximum file size 5 MB</small></label>
+                <label>Or Resource Link<input name="resourceLink" type="url" placeholder="https://drive.google.com/..." /><small>Use a public Drive, OneDrive, or web link instead of a file.</small></label>
               </div>
               <p id="file-link-error" class="error-message group-error" aria-live="polite"></p>
             </fieldset>
@@ -143,6 +143,6 @@
 
     <iframe name="helpdesk-upload-target" id="helpdesk-upload-target" hidden title="Submission transport"></iframe>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="script.js?v=20260802-27"></script>
+  <script src="script.js?v=20260802-28"></script>
   </body>
 </html>
