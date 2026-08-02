@@ -40,15 +40,6 @@ function hideUploadStatus() {
   document.querySelector('#upload-overlay').hidden = true;
 }
 
-function showStatusFallback(error, receiptNumber) {
-  const link = document.createElement('a');
-  link.href = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&transport=page`;
-  link.target = '_blank';
-  link.rel = 'noopener';
-  link.textContent = 'Open status page';
-  error.replaceChildren('Status could not be displayed here. ', link);
-}
-
 function setError(field, message = '') {
   field.classList.toggle('invalid', Boolean(message));
   const error = field.closest('label')?.querySelector('.error-message');
@@ -300,6 +291,7 @@ statusForm.addEventListener('submit', (event) => {
   const callbackName = `polytechnicStatus${Date.now()}`;
   const request = document.createElement('script');
   const statusFrame = document.createElement('iframe');
+  const frameRequestId = `ph-status-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   statusFrame.hidden = true;
   statusFrame.title = '';
   statusFrame.setAttribute('aria-hidden', 'true');
@@ -318,9 +310,8 @@ statusForm.addEventListener('submit', (event) => {
     renderSubmissionStatus(response);
   };
   const receiveFrameStatus = (messageEvent) => {
-    if (messageEvent.source !== statusFrame.contentWindow) return;
     const message = messageEvent.data;
-    if (message?.type === 'polytechnic-helpdesk-status') finishWithResponse(message.response);
+    if (message?.type === 'polytechnic-helpdesk-status' && message.requestId === frameRequestId) finishWithResponse(message.response);
   };
   const finish = () => {
     request.remove();
@@ -334,7 +325,7 @@ statusForm.addEventListener('submit', (event) => {
     finish();
     button.disabled = false;
     button.innerHTML = 'Check status <span aria-hidden="true">→</span>';
-    showStatusFallback(error, receiptNumber);
+    error.textContent = 'We could not check the status right now. Please try again later or contact the Polytechnic Helpdesk.';
   }, 12000);
 
   button.disabled = true;
@@ -345,7 +336,7 @@ statusForm.addEventListener('submit', (event) => {
     request.remove();
   };
   request.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&prefix=${callbackName}&_=${Date.now()}`;
-  statusFrame.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&transport=frame&_=${Date.now()}`;
+  statusFrame.src = `${APPS_SCRIPT_WEB_APP_URL}?receipt=${encodeURIComponent(receiptNumber)}&transport=frame&requestId=${encodeURIComponent(frameRequestId)}&origin=${encodeURIComponent(window.location.origin)}&_=${Date.now()}`;
   window.addEventListener('message', receiveFrameStatus);
   document.head.appendChild(request);
   document.body.appendChild(statusFrame);

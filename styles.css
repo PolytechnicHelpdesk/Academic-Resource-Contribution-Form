@@ -22,4 +22,3 @@ footer { display:flex; justify-content:space-between; width:min(1320px,calc(100%
 .status-result.rejected { border-color:#f3d2d0; background:#fff6f5; }
 .default-status { display:inline-flex; align-items:center; gap:8px; margin-top:17px !important; padding:7px 10px; border-radius:999px; background:#fff3d8; color:#8a6113 !important; font-size:11px !important; }
 .default-status strong { color:#754e09; font-weight:800; }
-.status-error a { color:#a43232; font-weight:800; }
